@@ -1,0 +1,175 @@
+{
+  "id": "desk_tuesday",
+  "name": "Martes · Mesa",
+  "location": "Oficina abierta, tu mesa",
+  "start": "09:00",
+  "end": "17:00",
+  "seconds_per_game_minute": 1.0,
+  "report_rate_per_minute": 0.28,
+  "free": true,
+  "events": [
+    {
+      "at": "09:02",
+      "type": "message",
+      "from": "boss",
+      "text": "Candela, el informe trimestral tiene que estar en mi mesa a las 17:00. Sin excusas.",
+      "options": [
+        {
+          "label": "Cuenta con ello.",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "at": "09:10",
+      "type": "message",
+      "from": "mario",
+      "text": "Buenos días 😏 ¿Café? Paso en un rato a por el mío… y a verte.",
+      "options": [
+        {
+          "label": "Trae dos.",
+          "effects": {
+            "visit_delay": -6,
+            "mood": 1
+          }
+        },
+        {
+          "label": "Estoy liada, Mario.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
+    },
+    {
+      "at": "09:25",
+      "type": "visit",
+      "coworker": "mario"
+    },
+    {
+      "at": "10:15",
+      "type": "message",
+      "from": "dani",
+      "text": "Te veo desde mi sitio. Esa falda es un crimen contra la productividad 🔥",
+      "options": [
+        {
+          "label": "Ven a denunciarlo en persona.",
+          "effects": {
+            "visit_delay": -8,
+            "mood": 1
+          }
+        },
+        {
+          "label": "Jaja, a trabajar.",
+          "effects": {}
+        },
+        {
+          "label": "Déjame en paz.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
+    },
+    {
+      "at": "10:40",
+      "type": "visit",
+      "coworker": "dani"
+    },
+    {
+      "at": "11:30",
+      "type": "message",
+      "from": "boss",
+      "text": "A las 12:00 pasa un cliente por la planta. Que os vea PRESENTABLES.",
+      "options": [
+        {
+          "label": "Entendido.",
+          "effects": {}
+        }
+      ],
+      "dress_check": "12:00"
+    },
+    {
+      "at": "11:45",
+      "type": "visit",
+      "coworker": "sergio"
+    },
+    {
+      "at": "13:30",
+      "type": "message",
+      "from": "sergio",
+      "text": "Lo de esta mañana me ha dejado con ganas de más. ¿Después de comer?",
+      "options": [
+        {
+          "label": "Te espero.",
+          "effects": {
+            "visit_delay": -10,
+            "mood": 1
+          }
+        },
+        {
+          "label": "Hoy no puedo, en serio.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
+    },
+    {
+      "at": "14:20",
+      "type": "visit",
+      "coworker": "sergio"
+    },
+    {
+      "at": "15:10",
+      "type": "visit",
+      "coworker": "mario"
+    },
+    {
+      "at": "15:50",
+      "type": "message",
+      "from": "boss",
+      "text": "¿Cómo va ese informe? Te quiero ver concentrada.",
+      "options": [
+        {
+          "label": "Casi listo.",
+          "effects": {}
+        }
+      ],
+      "dress_check": "16:10"
+    },
+    {
+      "at": "16:15",
+      "type": "visit",
+      "coworker": "dani"
+    }
+  ],
+  "layers_disabled": {
+    "background": "res://assets/layers/desk_tuesday/background.png",
+    "desk": "res://assets/layers/props/desk.png",
+    "station": {
+      "x": 600,
+      "y": 810,
+      "h": 640
+    },
+    "man_wait": {
+      "x": 980,
+      "y": 812,
+      "h": 660
+    }
+  },
+  "props": {
+    "blouse": {
+      "image": "res://assets/props/blouse.png",
+      "x": 0.125,
+      "y": 0.218,
+      "w": 0.0903
+    },
+    "skirt": {
+      "image": "res://assets/props/skirt.png",
+      "x": 0.6558,
+      "y": 0.5967,
+      "w": 0.2242
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "boss": {
+    "name": "Jefe",
+    "kind": "boss",
+    "color": "#c0392b",
+    "look": "middle aged man, grey hair, thick grey mustache, dark navy suit jacket, red tie, stern frown, reading glasses",
+    "sprite_seed": 6201
+  },
+  "mario": {
+    "name": "Mario",
+    "kind": "coworker",
+    "color": "#2980b9",
+    "wants": {
+      "top": false,
+      "bottom": true
+    },
+    "act": "te folla las tetas mientras tecleas",
+    "arousal_rate": 24.0,
+    "arousal_rate_unmet": 6.0,
+    "patience": 28.0,
+    "on_reject": "aggravate",
+    "brings": "dani",
+    "greeting": "Buenos días, Candela. Qué bien que hayas venido hoy.",
+    "hint": "Ese jersey te queda genial… ¿y sin él? Me apetece algo entre esas dos.",
+    "finish": "Gracias, guapa. Vuelvo luego.",
+    "look": "short brown hair, stubble, light blue dress shirt, blue tie, rolled sleeves, grey slacks",
+    "act_line": "Apriétalas. Así. No pares de escribir.",
+    "climax": "Me voy a correr… quédate quieta."
+  },
+  "dani": {
+    "name": "Dani",
+    "kind": "coworker",
+    "color": "#27ae60",
+    "wants": {
+      "top": true,
+      "bottom": true
+    },
+    "act": "te la mete en la boca sin que sueltes el teclado",
+    "arousal_rate": 30.0,
+    "arousal_rate_unmet": 5.0,
+    "patience": 22.0,
+    "on_reject": "leave",
+    "greeting": "Hola Candela, pasaba por aquí…",
+    "hint": "No hace falta que te quites nada. Solo abre la boca.",
+    "finish": "Eres la mejor del departamento.",
+    "look": "short black hair, undercut, green polo shirt, lanyard with badge, dark jeans, athletic",
+    "act_line": "Mírame mientras tecleas. Eres increíble.",
+    "climax": "Abre bien, me voy a correr."
+  },
+  "sergio": {
+    "name": "Sergio",
+    "kind": "coworker",
+    "color": "#8e44ad",
+    "wants": {
+      "top": false,
+      "bottom": false
+    },
+    "act": "te pone contra la mesa",
+    "arousal_rate": 20.0,
+    "arousal_rate_unmet": 4.0,
+    "patience": 18.0,
+    "on_reject": "aggravate",
+    "brings": "mario",
+    "greeting": "Candela, necesito diez minutos de tu tiempo. Todo tu tiempo.",
+    "hint": "Hoy no me vale a medias. Todo fuera.",
+    "finish": "Diez minutos bien invertidos.",
+    "look": "bald, dark beard, purple dress shirt, black vest, glasses, stocky",
+    "sprite_seed": 6071,
+    "act_line": "Sigue con el informe. Yo sigo con lo mío.",
+    "climax": "Aguanta… ya."
+  }
+}

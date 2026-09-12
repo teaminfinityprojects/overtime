@@ -1,0 +1,10 @@
+{
+  "name": "flash",
+  "description": "Animación Flash de los 2000 (Newgrounds): línea gruesa, color plano, vista de habitación. Elegido el 11 sep 2026.",
+  "ckpt": "waiIllustriousSDXL_v170.safetensors",
+  "lora": "flash_cartoon_il.safetensors",
+  "lora_strength": 0.9,
+  "trigger": "thickflashstyle, flat color",
+  "preset": "toon",
+  "seed": 4243
+}
