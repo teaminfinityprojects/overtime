@@ -82,6 +82,21 @@ Pruebas de estilo guardadas en `.godot/art_tests/` (`styles/` etiquetas, `styles
 - Viñetas de clímax `climax_{ropa}_{quien}.png`: edición de la escena de sexo con la LoRA NSFW; hay que decir que
   la cara de él queda limpia o le pone fluidos.
 
+## Iconos
+
+Nada de emojis en la UI: **Tabler Icons** (MIT) como SVG en `assets/icons/`, importados a escala 4 (96 px) para que no
+pixelen al agrandar la ventana, y tintados por `modulate`. Helpers en `UIKit`: `icon(name, size, color)`,
+`icon_text_button(icon, texto, …)`, `flat_icon_button(icon, …)`, `stars(n)`. Godot solo *encoge* el icono de un
+botón (`icon_max_width`), nunca lo agranda por encima del alto del texto: si un icono sale pequeño, sube el alto
+mínimo del botón. Añadir un icono = descargar el SVG de `@tabler/icons/icons/outline/<nombre>.svg`.
+
+## TODO
+
+- **Calidad de vídeo**: los bucles están a 704×480 y 12 fps en spritesheets de ~8–10 MB (239 MB en total). Para que
+  se vea de alta calidad en cualquier pantalla: generar a 1344×768 (máximo local de H3), 24 fps, y servir vídeo real
+  (VP9/WebM en el export HTML5, Theora en escritorio) en vez de spritesheets. Pedido por el usuario el 12 sep 2026.
+- Sonido de UI, mensajes generados por LLM, nivel 2 (unidad de venta), monetización, commit inicial.
+
 ## Comandos
 
     godot -e --path .
