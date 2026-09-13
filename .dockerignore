@@ -1,0 +1,11 @@
+.git
+.godot
+.claude
+.env
+build
+exports
+tools/*.py
+tools/*.sh
+*.md
+assets/anim
+.DS_Store

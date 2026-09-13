@@ -188,6 +188,33 @@ Vídeo Theora y OGG funcionan en web; el navegador exige un clic antes de reprod
 primer clic del jugador arranca el mezclador). Tamaño del export: 134 MB (pck de 100 MB + wasm de 40 MB; `assets/anim` queda excluido del preset); en itch.io el límite
 por archivo es 500 MB (1 GB en proyectos HTML5 con permiso), así que cabe.
 
+## Hosting (Dokploy)
+
+Todo lo necesario está en `deploy/` y `.github/workflows/deploy.yml`:
+
+- `deploy/Dockerfile`: dos etapas. La primera exporta el juego con `barichello/godot-ci:4.7.2` (Godot + plantillas
+  preinstaladas) y comprueba que los medios no sean punteros LFS; la segunda es `nginx:1.27-alpine` con
+  `deploy/nginx.conf` (MIME de `.wasm`/`.pck`, gzip, COOP/COEP, `/healthz`). Imagen final ≈ 150 MB.
+- `deploy.yml`: en cada push a `main`, checkout **con LFS**, construye la imagen y la publica en
+  `ghcr.io/teaminfinityprojects/overtime:latest` (y `:<sha>`); si existe el secreto `DOKPLOY_WEBHOOK_URL`, llama al
+  webhook para redeplegar.
+
+Pasos en Dokploy (una vez):
+
+1. Crear una aplicación de tipo **Docker** con la imagen `ghcr.io/teaminfinityprojects/overtime:latest`. Si el paquete
+   es privado, añadir en Dokploy un registro `ghcr.io` con un token de GitHub con permiso `read:packages`; o hacer el
+   paquete público en GitHub → Packages → overtime → Package settings.
+2. Puerto del contenedor **80**; dominio (p. ej. `overtime.fakecams.com` o `play.fakecams.com`) con HTTPS por Traefik.
+3. Copiar la URL del webhook de despliegue de la app y guardarla en GitHub → Settings → Secrets → `DOKPLOY_WEBHOOK_URL`.
+4. Cada push a `main` publica y redespliega solo. Para probar antes: **Actions → deploy-web → Run workflow**.
+
+Alternativa (Dokploy construyendo desde el repo, tipo *Application* con Dockerfile `deploy/Dockerfile`): solo funciona si
+su clon resuelve Git LFS; si no, la primera etapa falla con "es un puntero de Git LFS". Por eso el camino recomendado
+es la imagen de GHCR.
+
+Recordatorio legal: la licencia de MiniMax H3 no permite mostrar sus salidas en EE. UU., UE, UK y Corea. Si el
+despliegue es público, decidir si se asume o se bloquean esas regiones en Traefik/Cloudflare.
+
 ## Git LFS
 
 Desde `b07c8ab` los medios de `assets/` (png, ogv, ogg, mp3, ttf) van por **Git LFS** (`.gitattributes`). Solo hacia
