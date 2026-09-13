@@ -1,0 +1,240 @@
+{
+  "defaults": {
+    "flirt": [
+      {
+        "label": "Ven a verme.",
+        "effects": {
+          "visit_delay": -8
+        }
+      },
+      {
+        "label": "Jaja, a trabajar.",
+        "effects": {}
+      },
+      {
+        "label": "Para ya.",
+        "effects": {
+          "reject": true
+        }
+      }
+    ],
+    "after": [
+      {
+        "label": "😏",
+        "effects": {}
+      },
+      {
+        "label": "Ahora déjame trabajar.",
+        "effects": {}
+      }
+    ],
+    "angry": [
+      {
+        "label": "Lo siento, de verdad.",
+        "effects": {}
+      },
+      {
+        "label": "Pues nada.",
+        "effects": {}
+      }
+    ],
+    "nag": [
+      {
+        "label": "En ello, jefe.",
+        "effects": {}
+      }
+    ],
+    "tease": [
+      {
+        "label": "Ya veremos…",
+        "effects": {
+          "visit_delay": -5
+        }
+      },
+      {
+        "label": "Céntrate en lo tuyo.",
+        "effects": {}
+      }
+    ]
+  },
+  "pools": {
+    "mario": {
+      "flirt": [
+        {
+          "text": "¿Sabes qué le falta a este café? Tú, mirándome mientras me lo tomo."
+        },
+        {
+          "text": "Acabo de pasar por tu lado y he tenido que volver a sentarme. Culpa tuya."
+        },
+        {
+          "text": "Tengo diez minutos libres y una sola idea de en qué gastarlos 😏"
+        },
+        {
+          "text": "¿Ese jersey nuevo es para mí o me lo imagino?"
+        },
+        {
+          "text": "La máquina de café está rota. Necesito otra forma de despertarme."
+        },
+        {
+          "text": "Te juro que si no vengo a verte ahora no saco nada adelante hoy."
+        },
+        {
+          "text": "Se me ha caído el boli tres veces mirando hacia tu mesa. Tres."
+        },
+        {
+          "text": "Café con leche, dos azúcares y… lo que tú quieras."
+        }
+      ],
+      "after": [
+        {
+          "text": "Todavía tiemblo. Y tengo reunión en cinco minutos, no sé cómo lo voy a hacer."
+        },
+        {
+          "text": "Eso no ha sido un descanso para el café, ha sido religioso."
+        },
+        {
+          "text": "Gracias, guapa. Te debo un café de verdad, uno bueno."
+        },
+        {
+          "text": "No puedo dejar de sonreír y la gente me mira raro. Merece la pena."
+        }
+      ],
+      "angry": [
+        {
+          "text": "Vale. Mensaje recibido. Hoy no molesto más."
+        },
+        {
+          "text": "Me he sentido un poco tonto ahí de pie, ¿sabes?"
+        }
+      ]
+    },
+    "dani": {
+      "flirt": [
+        {
+          "text": "Acabo de salir del gym. Necesito bajar el pulso… o subirlo del todo."
+        },
+        {
+          "text": "Desde mi sitio te veo teclear. Esa boca concentrada me está matando."
+        },
+        {
+          "text": "No pido mucho: ni ropa fuera, ni excusas. Solo dos minutos de tu atención."
+        },
+        {
+          "text": "Te he traído una botella de agua. Es una excusa, obviamente."
+        },
+        {
+          "text": "Cinco minutos. Ni siquiera tienes que dejar el teclado."
+        },
+        {
+          "text": "¿Sabes que se te caen las gafas cuando te concentras? Es lo mejor de esta oficina."
+        },
+        {
+          "text": "Hoy llevo el polo verde. Sé que te gusta. Lo he hecho a propósito."
+        },
+        {
+          "text": "Me he apuntado a la reunión de tu departamento solo para pasar por tu mesa."
+        }
+      ],
+      "after": [
+        {
+          "text": "Eres la mejor del departamento. Y no lo digo por el informe."
+        },
+        {
+          "text": "Ahora sí puedo concentrarme. Vale, no, pero al menos estoy de buen humor."
+        },
+        {
+          "text": "He vuelto a mi mesa con las piernas de gelatina. Gracias por eso."
+        },
+        {
+          "text": "Luego te invito a algo. Fuera de la oficina, si te apetece."
+        }
+      ],
+      "angry": [
+        {
+          "text": "Entendido. Otro día será."
+        },
+        {
+          "text": "No pasa nada, ya sé que hoy vas a tope. Suerte con el informe."
+        }
+      ]
+    },
+    "sergio": {
+      "flirt": [
+        {
+          "text": "Tengo un hueco en la agenda a las y media. Lo he bloqueado con tu nombre."
+        },
+        {
+          "text": "He revisado tu productividad de esta mañana. Creo que necesitas una pausa activa."
+        },
+        {
+          "text": "No me gustan las medias tintas. Cuando vaya, quiero todo fuera. Aviso."
+        },
+        {
+          "text": "Diez minutos de tu tiempo. Diez. Bien invertidos, ya lo sabes."
+        },
+        {
+          "text": "Estás sentada de una manera que no es profesional. Voy a tener que comprobarlo."
+        },
+        {
+          "text": "He cerrado la puerta de la sala de reuniones. Pero prefiero tu mesa."
+        },
+        {
+          "text": "Cuando me subo las gafas es que estoy pensando en algo. Adivina en qué."
+        },
+        {
+          "text": "Hoy no quiero conversación. Quiero lo que sabes."
+        }
+      ],
+      "after": [
+        {
+          "text": "Diez minutos bien invertidos. Como siempre."
+        },
+        {
+          "text": "Me he tenido que sentar un rato antes de volver a la reunión. Anotado."
+        },
+        {
+          "text": "Eficiente. Precisa. Deberías estar en mi equipo."
+        },
+        {
+          "text": "Ahora sí, termina ese informe. Que no diga el jefe que te distraigo."
+        }
+      ],
+      "angry": [
+        {
+          "text": "Esto lo apunto, Candela."
+        },
+        {
+          "text": "No me gusta esperar. Y menos para nada."
+        }
+      ]
+    },
+    "boss": {
+      "nag": [
+        {
+          "text": "¿Ese informe se está escribiendo solo? Porque desde aquí no te veo tecleando mucho."
+        },
+        {
+          "text": "Recuerda: 17:00. No 17:05. No 'casi'. 17:00."
+        },
+        {
+          "text": "Dirección me pregunta por los números. Dime que voy a poder decirles algo."
+        },
+        {
+          "text": "Veo mucho movimiento alrededor de tu mesa. Espero que sea trabajo."
+        },
+        {
+          "text": "Cuando termines el informe, quiero un resumen ejecutivo. Antes de las cinco también."
+        },
+        {
+          "text": "Candela, te noto dispersa. Concéntrate."
+        },
+        {
+          "text": "Si necesitas ayuda, pídela. Si no la necesitas, entrega."
+        },
+        {
+          "text": "Este trimestre nos va a definir. Ese informe también."
+        }
+      ]
+    }
+  }
+}

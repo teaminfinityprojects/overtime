@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Overtime"
+config/version="0.2"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -21,6 +22,7 @@ Metrics="*res://scripts/autoload/metrics.gd"
 Catalog="*res://scripts/autoload/catalog.gd"
 Meta="*res://scripts/autoload/meta.gd"
 Screen="*res://scripts/autoload/screen.gd"
+Sfx="*res://scripts/autoload/sfx.gd"
 
 [display]
 
@@ -28,14 +30,8 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/size/window_width_override=1280
 window/size/window_height_override=720
-window/size/resizable=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-
-[rendering]
-
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
 
 [input]
 
@@ -44,3 +40,12 @@ toggle_fullscreen={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194342,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
+[gui]
+
+theme/custom="res://assets/ui/theme.tres"

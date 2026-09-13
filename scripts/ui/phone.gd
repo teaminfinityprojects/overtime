@@ -40,7 +40,13 @@ func bind(day_node: Day) -> void:
 	_build()
 
 
+var _last_can_answer := true
+
+
 func _process(_delta: float) -> void:
+	if day and day.can_answer() != _last_can_answer:
+		_last_can_answer = day.can_answer()
+		_dirty = true
 	if day == null:
 		return
 	_clock.text = Catalog.format_clock(day.clock)
@@ -82,11 +88,15 @@ func _build() -> void:
 	top.add_child(UIKit.icon("wifi", 18, DIM))
 	top.add_child(UIKit.icon("battery-3", 18, DIM))
 	_report_label = UIKit.label("Informe 0 %", 16, UIKit.GOLD)
+	_report_label.visible = false
 	top.add_child(_report_label)
 	status_box.add_child(top)
 	_report_bar = _bar(UIKit.GOLD, 8)
+	_report_bar.visible = false
 	status_box.add_child(_report_bar)
+	# El informe y la productividad viven ahora en el HUD sobre la escena; el móvil es solo móvil.
 	var prod := UIKit.hbox(6)
+	prod.visible = false
 	prod.add_child(UIKit.label("Productividad", 13, DIM))
 	prod.add_child(UIKit.spacer())
 	_pips = UIKit.hbox(3)
@@ -162,6 +172,9 @@ func _on_message(message: Dictionary) -> void:
 
 
 func _choose(message: Dictionary, option: Dictionary) -> void:
+	if not day.can_answer():
+		_dirty = true
+		return
 	var from: String = message["from"]
 	var time := Catalog.format_clock(day.clock)
 	_threads[from] = _threads.get(from, []) + [{"text": option["label"], "mine": true, "time": time}]
@@ -318,10 +331,17 @@ func _render_thread(from: String) -> void:
 	else:
 		var message: Dictionary = pending[0]
 		var options := UIKit.vbox(6)
+		var can := day.can_answer()
+		if not can:
+			var why := "Deja de tocarte para contestar" if day.is_distracted else ("Espera a terminar de cambiarte" if day.changing != "" else "Vuelve a Trabajar para contestar")
+			var hint := UIKit.label(why, 12, UIKit.GOLD)
+			hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			options.add_child(hint)
 		for option in message.get("options", []):
 			var reject: bool = option.get("effects", {}).get("reject", false)
 			var chip := UIKit.button(option["label"], UIKit.BAD.darkened(0.35) if reject else ACCENT.darkened(0.25), 16)
 			chip.custom_minimum_size = Vector2(0, 42)
+			chip.disabled = not can
 			chip.pressed.connect(_choose.bind(message, option))
 			options.add_child(chip)
 		_footer.add_child(options)

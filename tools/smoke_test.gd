@@ -18,10 +18,7 @@ func _run() -> void:
 	Meta.persist = false
 	var day := Day.new()
 	add_child(day)
-	day.message_received.connect(func(m: Dictionary) -> void:
-		_messages += 1
-		# Responde siempre la primera opción (nunca rechaza).
-		day.answer(m, m["options"][0]))
+	day.message_received.connect(func(_m: Dictionary) -> void: _messages += 1)
 	day.visit_started.connect(func(_id: String) -> void: _visits += 1)
 	day.day_ended.connect(func(w: bool, s: int) -> void:
 		_ended = true
@@ -38,6 +35,10 @@ func _run() -> void:
 	var ticks := 0
 	while not _ended and ticks < 4000:
 		ticks += 1
+		# Responde la primera opción (nunca rechaza) en cuanto puede: solo se contesta trabajando.
+		if day.can_answer():
+			for m in day.pending_messages.duplicate():
+				day.answer(m, m["options"][0])
 		# Estrategia: si hay visita, quitarse lo que pida y atenderla; si no, vestirse y trabajar.
 		if day.changing != "":
 			pass
@@ -68,7 +69,6 @@ func _run() -> void:
 	_ended = false
 	var lazy := Day.new()
 	add_child(lazy)
-	lazy.message_received.connect(func(m: Dictionary) -> void: lazy.answer(m, m["options"][m["options"].size() - 1]))
 	lazy.day_ended.connect(func(w: bool, _s: int) -> void:
 		_ended = true
 		_won = w)
@@ -77,13 +77,14 @@ func _run() -> void:
 	ticks = 0
 	while not _ended and ticks < 4000:
 		ticks += 1
+		for m in lazy.pending_messages.duplicate():
+			lazy.answer(m, m["options"][m["options"].size() - 1])
 		await get_tree().process_frame
 	_check(lazy.aggravated_count >= 1 or lazy.rejected.size() >= 1, "rechazar tiene consecuencias (%d cabreados, %d se van)" % [lazy.aggravated_count, lazy.rejected.size()])
 
 	# Tercera prueba: tocarse es decisión del jugador, nunca automático.
 	var hot := Day.new()
 	add_child(hot)
-	hot.message_received.connect(func(m: Dictionary) -> void: hot.answer(m, m["options"][0]))
 	hot.start(Catalog.level("desk_tuesday"))
 	hot.top_on = false
 	hot.bottom_on = false
@@ -91,7 +92,7 @@ func _run() -> void:
 	for i: int in 40:
 		await get_tree().process_frame
 	_check(not hot.is_distracted, "desvestida y sola en modo Trabajar NO se toca por su cuenta")
-	_check(hot.productivity_cap() == 4.0 and hot.productivity <= 4.0, "trabajar desnuda tiene tope 4 (productividad %.1f)" % hot.productivity)
+	_check(hot.productivity_cap() == 6.0 and hot.productivity <= 6.0, "trabajar desnuda tiene tope 6 (productividad %.1f)" % hot.productivity)
 	_check(hot.report > 0.0, "y aun así el informe avanza (%.1f%%)" % hot.report)
 	hot.set_mode(Day.Mode.FUCK)
 	await get_tree().process_frame
@@ -102,6 +103,14 @@ func _run() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_check(not hot.is_distracted, "al volver a Trabajar deja de tocarse")
+	# Regla nueva: con un mensaje pendiente y en modo Follar no se puede contestar; trabajando sí.
+	var probe := {"from": "boss", "text": "?", "options": [{"label": "ok", "effects": {}}]}
+	hot._deliver(probe)
+	var pending_msg: Dictionary = hot.pending_messages[hot.pending_messages.size() - 1]
+	hot.set_mode(Day.Mode.FUCK)
+	_check(not hot.answer(pending_msg, pending_msg["options"][0]), "follando no se contesta el móvil")
+	hot.set_mode(Day.Mode.WORK)
+	_check(hot.answer(pending_msg, pending_msg["options"][0]), "trabajando sí se contesta")
 	hot.queue_free()
 	print("   ignorando a todos: %s · informe %.0f%% · productividad %.1f" % ["entregado" if _won else "agotada", lazy.report, lazy.productivity])
 	_finish()

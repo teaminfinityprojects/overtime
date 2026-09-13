@@ -4,8 +4,8 @@
   "location": "Oficina abierta, tu mesa",
   "start": "09:00",
   "end": "17:00",
-  "seconds_per_game_minute": 1.0,
-  "report_rate_per_minute": 0.28,
+  "seconds_per_game_minute": 1.25,
+  "report_rate_per_minute": 0.36,
   "free": true,
   "events": [
     {
@@ -30,7 +30,7 @@
           "label": "Trae dos.",
           "effects": {
             "visit_delay": -6,
-            "mood": 1
+            "productivity": 1
           }
         },
         {
@@ -47,6 +47,30 @@
       "coworker": "mario"
     },
     {
+      "at": "09:50",
+      "type": "message",
+      "from": "dani",
+      "text": "He visto a Mario salir de tu mesa con cara de tonto 👀 ¿Qué me he perdido?",
+      "options": [
+        {
+          "label": "Ven y lo descubres.",
+          "effects": {
+            "visit_delay": -10
+          }
+        },
+        {
+          "label": "Nada, un café.",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "at": "10:00",
+      "type": "chatter",
+      "from": "dani",
+      "pool": "flirt"
+    },
+    {
       "at": "10:15",
       "type": "message",
       "from": "dani",
@@ -55,8 +79,7 @@
         {
           "label": "Ven a denunciarlo en persona.",
           "effects": {
-            "visit_delay": -8,
-            "mood": 1
+            "visit_delay": -8
           }
         },
         {
@@ -77,6 +100,37 @@
       "coworker": "dani"
     },
     {
+      "at": "10:55",
+      "type": "chatter",
+      "from": "sergio",
+      "pool": "flirt"
+    },
+    {
+      "at": "11:05",
+      "type": "message",
+      "from": "mario",
+      "text": "Lo de antes no me lo saco de la cabeza. Después de comer repetimos, ¿no?",
+      "options": [
+        {
+          "label": "Tráete otro café.",
+          "effects": {
+            "visit_delay": -15,
+            "productivity": 1
+          }
+        },
+        {
+          "label": "Ya veremos.",
+          "effects": {}
+        },
+        {
+          "label": "Se acabó, Mario.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
+    },
+    {
       "at": "11:30",
       "type": "message",
       "from": "boss",
@@ -95,7 +149,30 @@
       "coworker": "sergio"
     },
     {
-      "at": "13:30",
+      "at": "12:10",
+      "type": "message",
+      "from": "boss",
+      "text": "El cliente se ha ido. Ahora sí: quiero ver avances en ese informe.",
+      "options": [
+        {
+          "label": "Voy a ello.",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "at": "12:35",
+      "type": "visit",
+      "coworker": "dani"
+    },
+    {
+      "at": "12:50",
+      "type": "chatter",
+      "from": "mario",
+      "pool": "flirt"
+    },
+    {
+      "at": "13:15",
       "type": "message",
       "from": "sergio",
       "text": "Lo de esta mañana me ha dejado con ganas de más. ¿Después de comer?",
@@ -103,8 +180,7 @@
         {
           "label": "Te espero.",
           "effects": {
-            "visit_delay": -10,
-            "mood": 1
+            "visit_delay": -10
           }
         },
         {
@@ -116,14 +192,70 @@
       ]
     },
     {
+      "at": "13:45",
+      "type": "message",
+      "from": "mario",
+      "text": "¿Comes en la mesa? Yo también. Paso a las tres.",
+      "options": [
+        {
+          "label": "Te espero con hambre.",
+          "effects": {
+            "visit_delay": -8
+          }
+        },
+        {
+          "label": "Come tranquilo.",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "at": "14:00",
+      "type": "chatter",
+      "from": "boss",
+      "pool": "nag"
+    },
+    {
       "at": "14:20",
       "type": "visit",
       "coworker": "sergio"
     },
     {
+      "at": "14:45",
+      "type": "chatter",
+      "from": "dani",
+      "pool": "flirt"
+    },
+    {
       "at": "15:10",
       "type": "visit",
       "coworker": "mario"
+    },
+    {
+      "at": "15:25",
+      "type": "chatter",
+      "from": "sergio",
+      "pool": "flirt"
+    },
+    {
+      "at": "15:35",
+      "type": "message",
+      "from": "dani",
+      "text": "Última hora y todavía tecleando. Voy a darte un motivo para parar un rato.",
+      "options": [
+        {
+          "label": "Corre.",
+          "effects": {
+            "visit_delay": -10
+          }
+        },
+        {
+          "label": "Ni se te ocurra, tengo que acabar.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
     },
     {
       "at": "15:50",
@@ -142,6 +274,37 @@
       "at": "16:15",
       "type": "visit",
       "coworker": "dani"
+    },
+    {
+      "at": "16:30",
+      "type": "chatter",
+      "from": "boss",
+      "pool": "nag"
+    },
+    {
+      "at": "16:40",
+      "type": "message",
+      "from": "sergio",
+      "text": "Sé que estás acabando. Por eso vengo ahora.",
+      "options": [
+        {
+          "label": "Ven.",
+          "effects": {
+            "visit_delay": -5
+          }
+        },
+        {
+          "label": "Hoy no, Sergio.",
+          "effects": {
+            "reject": true
+          }
+        }
+      ]
+    },
+    {
+      "at": "16:50",
+      "type": "visit",
+      "coworker": "sergio"
     }
   ],
   "layers_disabled": {

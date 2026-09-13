@@ -15,9 +15,9 @@
       "bottom": true
     },
     "act": "te folla las tetas mientras tecleas",
-    "arousal_rate": 24.0,
-    "arousal_rate_unmet": 6.0,
-    "patience": 28.0,
+    "arousal_rate": 9.0,
+    "arousal_rate_unmet": 2.5,
+    "patience": 30.0,
     "on_reject": "aggravate",
     "brings": "dani",
     "greeting": "Buenos días, Candela. Qué bien que hayas venido hoy.",
@@ -25,7 +25,9 @@
     "finish": "Gracias, guapa. Vuelvo luego.",
     "look": "short brown hair, stubble, light blue dress shirt, blue tie, rolled sleeves, grey slacks",
     "act_line": "Apriétalas. Así. No pares de escribir.",
-    "climax": "Me voy a correr… quédate quieta."
+    "climax": "Me voy a correr… quédate quieta.",
+    "leave": "Vale, ya veo cómo va esto.",
+    "touch_rate": 3.0
   },
   "dani": {
     "name": "Dani",
@@ -36,16 +38,18 @@
       "bottom": true
     },
     "act": "te la mete en la boca sin que sueltes el teclado",
-    "arousal_rate": 30.0,
-    "arousal_rate_unmet": 5.0,
-    "patience": 22.0,
+    "arousal_rate": 11.0,
+    "arousal_rate_unmet": 2.5,
+    "patience": 26.0,
     "on_reject": "leave",
     "greeting": "Hola Candela, pasaba por aquí…",
     "hint": "No hace falta que te quites nada. Solo abre la boca.",
     "finish": "Eres la mejor del departamento.",
     "look": "short black hair, undercut, green polo shirt, lanyard with badge, dark jeans, athletic",
     "act_line": "Mírame mientras tecleas. Eres increíble.",
-    "climax": "Abre bien, me voy a correr."
+    "climax": "Abre bien, me voy a correr.",
+    "leave": "Otro día será, Candela.",
+    "touch_rate": 2.5
   },
   "sergio": {
     "name": "Sergio",
@@ -56,9 +60,9 @@
       "bottom": false
     },
     "act": "te pone contra la mesa",
-    "arousal_rate": 20.0,
-    "arousal_rate_unmet": 4.0,
-    "patience": 18.0,
+    "arousal_rate": 7.5,
+    "arousal_rate_unmet": 2.0,
+    "patience": 22.0,
     "on_reject": "aggravate",
     "brings": "mario",
     "greeting": "Candela, necesito diez minutos de tu tiempo. Todo tu tiempo.",
@@ -67,6 +71,8 @@
     "look": "bald, dark beard, purple dress shirt, black vest, glasses, stocky",
     "sprite_seed": 6071,
     "act_line": "Sigue con el informe. Yo sigo con lo mío.",
-    "climax": "Aguanta… ya."
+    "climax": "Aguanta… ya.",
+    "leave": "Esto lo apunto.",
+    "touch_rate": 3.5
   }
 }

@@ -12,12 +12,26 @@ var _anim_start: float = 0.0
 var _audio: AudioStreamPlayer
 var _audio_key: String = ""
 const AUDIO_DB := -6.0
+## Vídeo real (Theora, assets/video/<nivel>/<estado>.ogv, generado con Wan 2.2): si está activo tiene
+## prioridad sobre el spritesheet (assets/anim, bucles H3). Se dibuja a mano desde su textura para que
+## las capas (ropa colgada, compañero) queden encima. Desde el 12 sep 2026 los .ogv son los bucles H3
+## reescalados x2 (tools/upscale_video.py) con su audio original al lado; los Wan 2.2 se descartaron.
+const PREFER_VIDEO := true
+var _video: VideoStreamPlayer
+var _video_key: String = ""
 
 
 func _ready() -> void:
 	_audio = AudioStreamPlayer.new()
-	_audio.volume_db = AUDIO_DB
+	_audio.volume_db = Sfx.scene_db() + AUDIO_DB
 	add_child(_audio)
+	Sfx.volume_changed.connect(func() -> void: _audio.volume_db = Sfx.scene_db() + AUDIO_DB)
+	_video = VideoStreamPlayer.new()
+	_video.loop = true
+	_video.expand = true
+	_video.visible = false
+	_video.volume_db = -80.0
+	add_child(_video)
 
 
 func _process(delta: float) -> void:
@@ -25,16 +39,13 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-## Arranca (o para) el sonido del estado; `anim_key` es la clave cuyo bucle se está dibujando.
-func _sync_audio(anim_key: String) -> void:
-	if anim_key == _audio_key:
+## Arranca (o para) el sonido de la ruta dada (OGG en bucle); "" lo apaga.
+func _sync_audio(path: String) -> void:
+	if path == _audio_key:
 		return
-	_audio_key = anim_key
+	_audio_key = path
 	_audio.stop()
-	if anim_key == "":
-		return
-	var path := "res://assets/anim/%s/%s.ogg" % [_level_id(), anim_key]
-	if not ResourceLoader.exists(path):
+	if path == "" or not ResourceLoader.exists(path):
 		return
 	var stream: AudioStreamOggVorbis = load(path)
 	stream.loop = true
@@ -53,7 +64,7 @@ func state_key() -> String:
 	if day == null:
 		return "work_top_bottom_none"
 	if day.climaxing != "":
-		return "climax_%s_%s" % [_clothes(), day.climaxing]
+		return "%s_%s_%s" % ["climaxwork" if day.climax_from_work else "climax", _clothes(), day.climaxing]
 	if day.mode == Day.Mode.FUCK and not day.visitor.is_empty():
 		return "fuck_%s_%s" % [_clothes(), day.visitor["id"]]
 	if day.is_distracted:
@@ -66,6 +77,9 @@ func state_key() -> String:
 ## Claves alternativas si falta la imagen exacta, de más a menos parecida.
 func _fallbacks(key: String) -> Array[String]:
 	var out: Array[String] = []
+	if key.begins_with("climaxwork_"):
+		out.append(key.replace("climaxwork_", "climax_"))
+		out.append(key.replace("climaxwork_", "work_"))
 	if key.begins_with("climax_"):
 		out.append(key.replace("climax_", "fuck_"))
 	if key.begins_with("hot_"):
@@ -79,6 +93,49 @@ func _fallbacks(key: String) -> Array[String]:
 
 func _level_id() -> String:
 	return day.level.get("id", "x")
+
+
+## Efecto de sonido por acto (assets/sfx/<acto>.ogg, Stable Audio 3): oral/titjob/sex con
+## visita, hot sola, y teclado/oficina para el resto.
+func _sfx_for(key: String) -> String:
+	var act := "work"
+	if key.begins_with("fuck_"):
+		act = Day.act_for(day.top_on, day.bottom_on)
+	elif key.begins_with("hot_"):
+		act = "hot"
+	var path := "res://assets/sfx/%s.ogg" % act
+	return path if ResourceLoader.exists(path) else ""
+
+
+## Vídeo para la clave o sus alternativas: la clave con .ogv existente, o "".
+func _video_for(key: String) -> String:
+	if not PREFER_VIDEO:
+		return ""
+	for k in [key] + _fallbacks(key):
+		var path := "res://assets/video/%s/%s.ogv" % [_level_id(), k]
+		var cache_key := "video:" + path
+		if not _cache.has(cache_key):
+			_cache[cache_key] = ResourceLoader.exists(path)
+		if _cache[cache_key]:
+			return k
+	return ""
+
+
+## Dibuja el fotograma actual del vídeo de `vkey` (cambiando de clip si hace falta).
+## Devuelve false mientras el primer fotograma no está listo.
+func _draw_video(vkey: String) -> bool:
+	if vkey != _video_key:
+		_video_key = vkey
+		_video.stop()
+		_video.stream = load("res://assets/video/%s/%s.ogv" % [_level_id(), vkey])
+		_video.play()
+	var tex := _video.get_video_texture()
+	if tex == null or tex.get_size().x < 2.0:
+		return false
+	var fit := _fit(tex.get_size())
+	draw_texture_rect(tex, fit, false)
+	_draw_props(fit)
+	return true
 
 
 
@@ -123,7 +180,7 @@ func _still_for(key: String) -> Texture2D:
 
 
 func _coworker_sprite() -> Texture2D:
-	if day.visitor.is_empty() or day.mode == Day.Mode.FUCK or day.climaxing != "":
+	if day.visitor.is_empty() or day.mode == Day.Mode.FUCK or day.climaxing != "" or day.is_touching():
 		return null
 	var path := "res://assets/coworkers/%s.png" % day.visitor["id"]
 	if not _cache.has(path):
@@ -140,11 +197,23 @@ func _draw() -> void:
 	if key != _last_key:
 		_last_key = key
 		_anim_start = _time
+	Sfx.duck_music(key.begins_with("fuck_") or key.begins_with("hot_") or key.begins_with("climax") or day.is_touching())
 	draw_rect(Rect2(Vector2.ZERO, size), UIKit.BG)
 
-	# Bucle animado si existe para este estado; si no, imagen fija.
+	# Vídeo real si existe; si no, bucle animado (spritesheet); si no, imagen fija.
+	var vkey := _video_for(key)
+	if vkey != "":
+		# Audio del propio clip (assets/video/<nivel>/<clave>.ogg) si existe; si no, efecto por acto.
+		var own := "res://assets/video/%s/%s.ogg" % [_level_id(), vkey]
+		_sync_audio(own if ResourceLoader.exists(own) else _sfx_for(key))
+		if _draw_video(vkey):
+			return
+	else:
+		_video_key = ""
+		_video.stop()
 	var anim := _anim_for(key)
-	_sync_audio(anim.get("key", ""))
+	if vkey == "":
+		_sync_audio("res://assets/anim/%s/%s.ogg" % [_level_id(), anim.get("key", "")] if not anim.is_empty() else _sfx_for(key))
 	if not anim.is_empty():
 		_draw_anim(anim)
 		_draw_props(_fit(Vector2(float(anim["meta"]["w"]), float(anim["meta"]["h"]))))

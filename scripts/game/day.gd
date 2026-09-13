@@ -8,6 +8,7 @@ signal message_answered(message: Dictionary, option: Dictionary)
 signal visit_started(coworker_id: String)
 signal visit_satisfied(coworker_id: String)
 signal visit_aggravated(coworker_id: String)
+signal visit_left(coworker_id: String)
 signal dress_check(passed: bool)
 signal productivity_hit(amount: float, reason: String)
 signal day_ended(won: bool, stars: int)
@@ -20,7 +21,11 @@ enum Mode { WORK, FUCK }
 const MAX_PRODUCTIVITY := 10.0
 ## Minutos de jornada que tarda en quitarse o ponerse una prenda; mientras, no produce.
 const CLOTHING_MINUTES := 1.5
-const CLIMAX_MINUTES := 1.2
+const CLIMAX_MINUTES := 2.0
+## Cada mensaje sin responder distrae: productividad que se pierde por minuto (se suma por mensaje).
+const PENDING_MESSAGE_DRAIN := 0.05
+## Un visitante cabreado aguanta este múltiplo de su paciencia y se va (con castigo).
+const LEAVE_PATIENCE_FACTOR := 1.3
 
 var level: Dictionary
 var clock: float
@@ -37,6 +42,8 @@ var changing_left: float = 0.0
 var is_distracted: bool = false
 ## Compañero que acaba de terminar: se muestra su viñeta unos instantes antes de irse.
 var climaxing: String = ""
+## true si acabó mientras ella trabajaba (escena climaxwork_*), false si fue en modo Follar.
+var climax_from_work: bool = false
 var _climax_left: float = 0.0
 var speed: float = 1.0
 var finished: bool = false
@@ -49,8 +56,12 @@ var satisfied_count: int = 0
 var aggravated_count: int = 0
 var pending_messages: Array[Dictionary] = []
 var rejected: Dictionary = {}
+## Compañeros ya rechazados por mensaje hoy (el primer rechazo es el que cuenta).
+var snubbed: Dictionary = {}
 var _events: Array = []
 var _dress_checks: Array = []
+## Mensajes del listado ya usados hoy, por "compañero/pool".
+var _used_chatter: Dictionary = {}
 var _seconds_per_minute: float = 1.0
 var _accumulator: float = 0.0
 
@@ -69,7 +80,7 @@ func _process(delta: float) -> void:
 	if finished or level.is_empty():
 		return
 	_accumulator += delta * speed / _seconds_per_minute
-	while _accumulator >= 0.1:
+	while _accumulator >= 0.1 and not finished:
 		_accumulator -= 0.1
 		_tick(0.1)
 
@@ -83,7 +94,8 @@ func _tick(minutes: float) -> void:
 	_update_visitor(minutes)
 	_update_solo_play()
 	_update_productivity(minutes)
-	if changing == "" and not is_distracted and climaxing == "":
+	# Solo avanza trabajando: en modo Follar deja el portátil (aunque él la toque o la folle mientras teclea, eso es modo Trabajar).
+	if mode == Mode.WORK and changing == "" and not is_distracted and climaxing == "":
 		report = minf(report + float(level["report_rate_per_minute"]) * (productivity / MAX_PRODUCTIVITY) * minutes, 100.0)
 	if report >= 100.0:
 		_finish(true)
@@ -100,6 +112,11 @@ func _fire_events() -> void:
 			"visit":
 				if not rejected.get(event["coworker"], false):
 					request_visit(event["coworker"])
+			"chatter":
+				if not rejected.get(event["from"], false):
+					var picked := pick_chatter(event["from"], event["pool"])
+					if not picked.is_empty():
+						_deliver(picked)
 	for check in _dress_checks.duplicate():
 		if clock >= check:
 			_dress_checks.erase(check)
@@ -121,7 +138,42 @@ func _deliver(message: Dictionary) -> void:
 	Metrics.track("message_shown", {"from": copy["from"]})
 
 
-func answer(message: Dictionary, option: Dictionary) -> void:
+## Saca un mensaje no usado del listado (data/messages.json) para ese compañero y pool.
+func pick_chatter(from: String, pool: String) -> Dictionary:
+	var lists: Dictionary = Catalog.messages.get("pools", {}).get(from, {})
+	var candidates: Array = lists.get(pool, [])
+	if candidates.is_empty():
+		return {}
+	var key := "%s/%s" % [from, pool]
+	var used: Array = _used_chatter.get(key, [])
+	if used.size() >= candidates.size():
+		used = []
+	var free: Array = []
+	for i in candidates.size():
+		if i not in used:
+			free.append(i)
+	var index: int = free[randi() % free.size()]
+	used.append(index)
+	_used_chatter[key] = used
+	var entry: Dictionary = candidates[index]
+	var options: Array = entry.get("options", Catalog.messages.get("defaults", {}).get(pool, [{"label": "Ok", "effects": {}}]))
+	return {"from": from, "text": entry["text"], "options": options.duplicate(true)}
+
+
+## Programa un mensaje del listado dentro de `minutes` minutos de jornada.
+func _schedule_chatter(from: String, pool: String, minutes: float) -> void:
+	_events.append({"at": Catalog.format_clock(clock + minutes), "type": "chatter", "from": from, "pool": pool})
+	_events.sort_custom(func(a, b): return Catalog.parse_clock(a["at"]) < Catalog.parse_clock(b["at"]))
+
+
+## Solo se puede responder trabajando (ni follando, ni tocándose, ni cambiándose). Devuelve false si no.
+func can_answer() -> bool:
+	return mode == Mode.WORK and not is_distracted and changing == "" and climaxing == "" and not finished
+
+
+func answer(message: Dictionary, option: Dictionary) -> bool:
+	if not can_answer() or message not in pending_messages:
+		return false
 	pending_messages.erase(message)
 	var effects: Dictionary = option.get("effects", {})
 	var from: String = message["from"]
@@ -129,15 +181,20 @@ func answer(message: Dictionary, option: Dictionary) -> void:
 		_reject(from)
 	if effects.has("visit_delay"):
 		_shift_visit(from, float(effects["visit_delay"]))
+	if effects.has("productivity"):
+		productivity = clampf(productivity + float(effects["productivity"]), 0.0, MAX_PRODUCTIVITY)
 	message_answered.emit(message, option)
 	Metrics.track("message_answered", {"from": from, "option": option["label"], "reject": effects.get("reject", false)})
+	return true
 
 
 ## Rechazo por mensaje: unos se van, otros se cabrean y aparecen antes con refuerzos.
 func _reject(coworker_id: String) -> void:
 	var data := Catalog.coworker(coworker_id)
-	if data.get("kind", "") != "coworker":
+	if data.get("kind", "") != "coworker" or snubbed.get(coworker_id, false):
 		return
+	# Solo el primer rechazo del día tiene consecuencias; los siguientes ya no suman cabreo.
+	snubbed[coworker_id] = true
 	if data.get("on_reject", "leave") == "leave":
 		rejected[coworker_id] = true
 	else:
@@ -183,6 +240,13 @@ func _update_visitor(minutes: float) -> void:
 			line_spoken.emit(visitor["id"], data.get("hint", ""))
 		if visitor["arousal"] >= 100.0:
 			_satisfy()
+	elif is_touching():
+		# Ella sigue tecleando y él aprovecha: le toca lo que lleva al aire (desnuda, la folla). Se calienta
+		# despacio, no se impacienta, y a ella le cuesta concentrarse (drenaje en _update_productivity).
+		var rate := float(data.get("touch_rate", 2.5)) * (1.8 if (not top_on and not bottom_on) else 1.3)
+		visitor["arousal"] = minf(visitor["arousal"] + rate * minutes, 100.0)
+		if visitor["arousal"] >= 100.0:
+			_satisfy()
 	else:
 		visitor["waited"] += minutes
 		if visitor["waited"] >= 3.0 and not visitor["hinted"]:
@@ -193,8 +257,26 @@ func _update_visitor(minutes: float) -> void:
 			aggravated_count += 1
 			visit_aggravated.emit(visitor["id"])
 			Metrics.track("visit_aggravated", {"coworker": visitor["id"]})
-			if data.has("brings"):
-				request_visit(data["brings"])
+		elif visitor["waited"] >= float(data["patience"]) * LEAVE_PATIENCE_FACTOR:
+			_leave_angry()
+
+
+## Se ha cansado de esperar: se va, ella se queda con el mal cuerpo y el informe lo nota.
+func _leave_angry() -> void:
+	var id: String = visitor["id"]
+	visitor = {}
+	if queue.is_empty():
+		mode = Mode.WORK
+	_hit(1.0, "%s se ha ido cabreado." % Catalog.coworker(id)["name"])
+	line_spoken.emit(id, Catalog.coworker(id).get("leave", "Ya veo cómo va esto."))
+	visit_left.emit(id)
+	_schedule_chatter(id, "angry", 3.0 + randf() * 4.0)
+	Metrics.track("visit_left", {"coworker": id})
+
+
+## En modo Trabajar con visita y alguna prenda fuera: él la toca (o la folla, si está desnuda) mientras teclea.
+func is_touching() -> bool:
+	return mode == Mode.WORK and not visitor.is_empty() and changing == "" and (not top_on or not bottom_on)
 
 
 ## Qué hace con el compañero según lo que lleva puesto: es la regla central del juego.
@@ -230,12 +312,14 @@ func _satisfy() -> void:
 	var id: String = visitor["id"]
 	satisfied_count += 1
 	productivity = minf(productivity + 3.0, MAX_PRODUCTIVITY)
+	climax_from_work = mode == Mode.WORK
 	visitor = {}
 	# Se queda un instante la viñeta del final antes de que se vaya y ella vuelva al informe.
 	climaxing = id
 	_climax_left = CLIMAX_MINUTES
 	climax.emit(id)
 	line_spoken.emit(id, Catalog.coworker(id).get("climax", "Me voy a correr…"))
+	_schedule_chatter(id, "after", 8.0 + randf() * 8.0)
 	Metrics.track("visit_satisfied", {"coworker": id, "act": current_act()})
 
 
@@ -254,21 +338,29 @@ func _update_climax(minutes: float) -> void:
 
 
 func _update_productivity(minutes: float) -> void:
+	# El móvil sin contestar distrae, haya o no alguien en la mesa.
+	if not pending_messages.is_empty():
+		productivity = maxf(productivity - PENDING_MESSAGE_DRAIN * pending_messages.size() * minutes, 0.0)
 	if visitor.is_empty():
 		_drain_when_alone(minutes)
 		return
-	# Esperando la toca y la besa: distrae. Follando mientras teclea: la productividad se hunde.
-	var drain := 0.3 if mode == Mode.WORK else 0.9
+	# Esperando apenas molesta; tocándola mientras teclea distrae; follándola mientras teclea, mucho.
+	# En modo Follar ella deja el portátil: la productividad no cae, pero el informe no avanza.
+	var drain := 0.0
+	if mode == Mode.WORK:
+		drain = 0.12
+		if is_touching():
+			drain = 0.25 if (not top_on and not bottom_on) else 0.12
 	if visitor.get("aggravated", false):
-		drain *= 1.8
+		drain *= 1.5
 	productivity = maxf(productivity - drain * minutes, 0.0)
 
 
-## Tope de productividad según la ropa: vestida 10, una prenda fuera 7, desnuda 4.
+## Tope de productividad según la ropa: vestida 10, una prenda fuera 8, desnuda 6.
 ## Puede trabajar así, pero rinde menos; el tope se ve en los pips del HUD.
 func productivity_cap() -> float:
 	var missing := int(not top_on) + int(not bottom_on)
-	return [MAX_PRODUCTIVITY, 7.0, 4.0][missing]
+	return [MAX_PRODUCTIVITY, 8.0, 6.0][missing]
 
 
 func _drain_when_alone(minutes: float) -> void:
@@ -281,7 +373,7 @@ func _drain_when_alone(minutes: float) -> void:
 		# Acaba de quitarse algo: baja hasta el tope, no de golpe.
 		productivity = maxf(productivity - 1.5 * minutes, cap)
 	elif mode == Mode.WORK and changing == "":
-		productivity = minf(productivity + 0.12 * minutes, cap)
+		productivity = minf(productivity + 0.35 * minutes, cap)
 
 
 func _hit(amount: float, reason: String) -> void:
@@ -354,6 +446,6 @@ func _finish(did_win: bool) -> void:
 	won = did_win
 	var stars := 0
 	if won:
-		stars = 1 + (1 if satisfied_count >= 3 else 0) + (1 if minutes_left() >= 60.0 else 0)
+		stars = 1 + (1 if satisfied_count >= 3 else 0) + (1 if minutes_left() >= 30.0 else 0)
 	Meta.record_day(level["id"], won, stars, report, satisfied_count)
 	day_ended.emit(won, stars)

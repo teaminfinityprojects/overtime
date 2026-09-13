@@ -4,12 +4,15 @@ extends Node
 var character: Dictionary = {}
 var coworkers: Dictionary = {}
 var levels: Dictionary = {}
+## Listado grande de mensajes preparados (data/messages.json): pools por compañero y opciones por defecto.
+var messages: Dictionary = {}
 var level_order: Array[String] = []
 
 
 func _ready() -> void:
 	character = load_json("res://data/characters/candela/character.json")
 	coworkers = load_json("res://data/coworkers.json")
+	messages = load_json("res://data/messages.json")
 	var dir := DirAccess.open("res://data/levels")
 	var ids: Array[String] = []
 	for file in dir.get_files():

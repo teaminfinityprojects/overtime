@@ -11,7 +11,6 @@ func _ready() -> void:
 	add_child(game)
 	await get_tree().process_frame
 	var day := game.day
-	day.message_received.connect(func(m: Dictionary) -> void: day.answer(m, m["options"][0]))
 	var ended := [false]
 	day.day_ended.connect(func(_w: bool, _s: int) -> void: ended[0] = true)
 	day.speed = 60.0
@@ -23,9 +22,21 @@ func _ready() -> void:
 	var ticks := 0
 	while not ended[0] and ticks < 3000:
 		ticks += 1
-		if day.changing == "" and not day.visitor.is_empty() and day.mode == Day.Mode.WORK:
-			day.set_mode(Day.Mode.FUCK)
-		if ticks % 7 == 0 and day.changing == "":
+		if day.can_answer():
+			for m in day.pending_messages.duplicate():
+				day.answer(m, m["options"][0])
+		if day.changing == "" and not day.visitor.is_empty():
+			# Se pone lo que quiere el visitante y folla; sola, vuelve al informe.
+			var wants: Dictionary = Catalog.coworker(day.visitor["id"]).get("wants", {})
+			if wants.has("top") and day.top_on != bool(wants["top"]):
+				day.toggle_top()
+			elif wants.has("bottom") and day.bottom_on != bool(wants["bottom"]):
+				day.toggle_bottom()
+			else:
+				day.set_mode(Day.Mode.FUCK)
+		elif day.visitor.is_empty() and day.climaxing == "":
+			day.set_mode(Day.Mode.WORK)
+		if ticks % 60 == 0 and day.changing == "" and day.visitor.is_empty():
 			# Cambios de ropa a destiempo, como hace un jugador.
 			if randf() < 0.5:
 				day.toggle_top()

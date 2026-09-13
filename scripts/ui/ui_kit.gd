@@ -11,6 +11,7 @@ const GOLD := Color("#f4c95d")
 const OK := Color("#4ade80")
 const BAD := Color("#ef4444")
 const HEART := Color("#ff6b9d")
+const FONT_BOLD := preload("res://assets/ui/nunito_bold.tres")
 
 
 static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
@@ -23,7 +24,82 @@ static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
 
 static func title(text: String, size: int = 40) -> Label:
 	var node := label(text, size)
+	node.add_theme_font_override("font", FONT_BOLD)
 	node.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return node
+
+
+## Etiqueta en negrita (cabeceras de tarjeta, nombres).
+static func bold(text: String, size: int = 20, color: Color = TEXT) -> Label:
+	var node := label(text, size, color)
+	node.add_theme_font_override("font", FONT_BOLD)
+	return node
+
+
+## Tarjeta flotante: fondo translúcido, borde sutil y sombra. Para HUD sobre la escena.
+static func card(color: Color = Color(0.09, 0.1, 0.14, 0.86), radius: int = 16, margin: int = 14) -> PanelContainer:
+	var node := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(radius)
+	style.set_content_margin_all(margin)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(1, 1, 1, 0.08)
+	style.shadow_color = Color(0, 0, 0, 0.35)
+	style.shadow_size = 10
+	style.shadow_offset = Vector2(0, 4)
+	node.add_theme_stylebox_override("panel", style)
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return node
+
+
+## Píldora de texto (estado, contador).
+static func pill(text: String, color: Color, size: int = 12) -> PanelContainer:
+	var node := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(color, 0.18)
+	style.set_corner_radius_all(999)
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 3
+	style.content_margin_bottom = 3
+	node.add_theme_stylebox_override("panel", style)
+	node.add_child(bold(text, size, color))
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return node
+
+
+## Barra de progreso fina y redondeada.
+static func bar(color: Color, height: float = 10.0, background: Color = Color(1, 1, 1, 0.08)) -> ProgressBar:
+	var node := ProgressBar.new()
+	node.custom_minimum_size = Vector2(0, height)
+	node.show_percentage = false
+	node.max_value = 100.0
+	node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = background
+	bg.set_corner_radius_all(int(height / 2))
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = color
+	fill.set_corner_radius_all(int(height / 2))
+	node.add_theme_stylebox_override("background", bg)
+	node.add_theme_stylebox_override("fill", fill)
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return node
+
+
+## Botón de icono redondo para pies de pantalla (con tooltip).
+static func round_icon_button(icon_name: String, tooltip: String, size: float = 44.0, color: Color = PANEL_LIGHT) -> Button:
+	var node := icon_text_button(icon_name, "", color, 16, size * 0.5)
+	node.custom_minimum_size = Vector2(size, size)
+	node.tooltip_text = tooltip
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style: StyleBoxFlat = node.get_theme_stylebox(state).duplicate()
+		style.set_corner_radius_all(int(size / 2))
+		node.add_theme_stylebox_override(state, style)
 	return node
 
 
@@ -49,6 +125,7 @@ static func button(text: String, color: Color = PRIMARY, size: int = 22) -> Butt
 	node.add_theme_color_override("font_hover_color", TEXT)
 	node.add_theme_color_override("font_pressed_color", TEXT)
 	node.add_theme_color_override("font_disabled_color", TEXT_DIM)
+	node.pressed.connect(func() -> void: Sfx.play("click"))
 	return node
 
 
