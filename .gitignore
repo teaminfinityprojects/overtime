@@ -1,6 +1,6 @@
 .godot/
 /build/
 /exports/
-export_presets.cfg
 .env
 .DS_Store
+.claude/

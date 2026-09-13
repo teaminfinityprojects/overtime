@@ -176,6 +176,25 @@ monetización obliga a salir de H3:
   navegador, más mensajes en `data/messages.json`.
 - `assets/anim` (238 MB) ya no se usa si hay vídeo: borrarlo o moverlo a Git LFS cuando el usuario lo decida.
 
+## Export HTML5
+
+`export_presets.cfg` trae el preset **Web** (GL Compatibility, sin hilos para no exigir cabeceras COOP/COEP en el
+hosting, sin PWA). Plantillas de exportación 4.7.2 en `~/Library/Application Support/Godot/export_templates/`.
+
+    godot --headless --path . --export-release Web build/web/index.html
+    python3 tools/serve_web.py            # http://localhost:8060 (añade COOP/COEP por si se activan los hilos)
+
+Vídeo Theora y OGG funcionan en web; el navegador exige un clic antes de reproducir audio (Godot lo gestiona: el
+primer clic del jugador arranca el mezclador). Tamaño del export: 134 MB (pck de 100 MB + wasm de 40 MB; `assets/anim` queda excluido del preset); en itch.io el límite
+por archivo es 500 MB (1 GB en proyectos HTML5 con permiso), así que cabe.
+
+## Git LFS
+
+Desde `b07c8ab` los medios de `assets/` (png, ogv, ogg, mp3, ttf) van por **Git LFS** (`.gitattributes`). Solo hacia
+delante: el historial anterior conserva los blobs (el clon sigue pesando ~500 MB; para reescribirlo haría falta
+`git lfs migrate import --everything` y un push forzado, decisión pendiente). Cuota gratuita de GitHub: 1 GB de
+almacenamiento y 1 GB/mes de ancho de banda LFS; cada clon baja ~260 MB de medios.
+
 ## Comandos
 
     godot -e --path .
