@@ -5,6 +5,8 @@ class_name Phone
 ## (hora, informe, productividad). Toda la lógica está en Day; aquí solo se muestra y se manda.
 
 signal reply_chosen(message: Dictionary, option: Dictionary)
+## El jugador ha abierto el anuncio desde el chat patrocinado (la pantalla pausa la jornada).
+signal sponsor_opened
 
 const BG := Color("#0b141a")
 const HEADER := Color("#202c33")
@@ -32,11 +34,17 @@ var _footer: PanelContainer
 var _banner: PanelContainer
 var _banner_tween: Tween
 var _dirty := true
+## Chat patrocinado (Ads): llega a la hora de data/ads.json › phone.at; no cuenta como mensaje pendiente.
+var _sponsor_at := -1.0
+var _sponsor_time := ""
+var _sponsor_seen := false
 
 
 func bind(day_node: Day) -> void:
 	day = day_node
 	day.message_received.connect(_on_message)
+	if Ads.enabled() and Ads.config("phone").has("at"):
+		_sponsor_at = Catalog.parse_clock(Ads.config("phone")["at"])
 	_build()
 
 
@@ -49,8 +57,10 @@ func _process(_delta: float) -> void:
 		_dirty = true
 	if day == null:
 		return
+	if _sponsor_at >= 0.0 and _sponsor_time == "" and day.clock >= _sponsor_at:
+		_sponsor_arrive()
 	_clock.text = Catalog.format_clock(day.clock)
-	_report_label.text = "Informe %.0f %%" % day.report
+	_report_label.text = tr("Informe %.0f %%") % day.report
 	_report_bar.value = day.report
 	for i: int in 10:
 		var pip: ColorRect = _pips.get_child(i)
@@ -87,7 +97,7 @@ func _build() -> void:
 	top.add_child(UIKit.icon("signal-4g", 18, DIM))
 	top.add_child(UIKit.icon("wifi", 18, DIM))
 	top.add_child(UIKit.icon("battery-3", 18, DIM))
-	_report_label = UIKit.label("Informe 0 %", 16, UIKit.GOLD)
+	_report_label = UIKit.label(tr("Informe 0 %"), 16, UIKit.GOLD)
 	_report_label.visible = false
 	top.add_child(_report_label)
 	status_box.add_child(top)
@@ -189,9 +199,21 @@ func _pending_for(from: String) -> Array:
 
 func _open(from: String) -> void:
 	_open_chat = from
+	if from == Ads.ID:
+		_sponsor_seen = true
 	_hide_banner()
 	_dirty = true
 	Metrics.track("phone_open_chat", {"from": from})
+
+
+func _sponsor_arrive() -> void:
+	_sponsor_time = Catalog.format_clock(day.clock)
+	# Solo notificación: a diferencia de los compañeros, no salta al chat ni interrumpe el que esté abierto.
+	if _open_chat != Ads.ID:
+		_notify(Ads.ID, Ads.config("phone").get("text", ""))
+	Sfx.play("notify")
+	Ads.impression("phone")
+	_dirty = true
 
 
 func _back() -> void:
@@ -210,6 +232,8 @@ func _render() -> void:
 		child.queue_free()
 	if _open_chat == "":
 		_render_list()
+	elif _open_chat == Ads.ID:
+		_render_sponsor()
 	else:
 		_render_thread(_open_chat)
 
@@ -253,7 +277,7 @@ func _render_list() -> void:
 		name_row.add_child(UIKit.label(_last_time.get(id, ""), 13, ACCENT if unread > 0 else DIM))
 		text.add_child(name_row)
 		var preview_row := UIKit.hbox(6)
-		var last: String = thread[-1]["text"] if not thread.is_empty() else "Toca para escribir"
+		var last: String = thread[-1]["text"] if not thread.is_empty() else tr("Toca para escribir")
 		if not thread.is_empty() and thread[-1]["mine"]:
 			preview_row.add_child(UIKit.icon("checks", 15, ACCENT))
 		var preview := UIKit.label(last, 15, DIM)
@@ -278,10 +302,12 @@ func _render_list() -> void:
 		sep.color = Color(DIM, 0.15)
 		sep.custom_minimum_size = Vector2(0, 1)
 		_list.add_child(sep)
+	if _sponsor_time != "":
+		_list.add_child(_sponsor_row())
 	var hint_row := UIKit.hbox(4)
 	hint_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	hint_row.add_child(UIKit.icon("lock", 11, DIM))
-	hint_row.add_child(UIKit.label("Tus mensajes personales están cifrados de extremo a extremo", 11, DIM))
+	hint_row.add_child(UIKit.label(tr("Tus mensajes personales están cifrados de extremo a extremo"), 11, DIM))
 	_list.add_child(hint_row)
 	var fake := UIKit.label("", 1)
 	_footer.add_child(fake)
@@ -295,8 +321,8 @@ func _render_thread(from: String) -> void:
 	_header_box.add_child(UIKit.avatar(from, 40))
 	var who := UIKit.vbox(0)
 	who.add_child(UIKit.label(data.get("name", from), 19, TEXT))
-	var status := "escribiendo…" if not _pending_for(from).is_empty() else ("en tu mesa" if day.visitor.get("id", "") == from else "en línea")
-	who.add_child(UIKit.label(status, 12, ACCENT if status != "en línea" else DIM))
+	var status := tr("escribiendo…") if not _pending_for(from).is_empty() else (tr("en tu mesa") if day.visitor.get("id", "") == from else tr("en línea"))
+	who.add_child(UIKit.label(status, 12, ACCENT if status != tr("en línea") else DIM))
 	_header_box.add_child(who)
 	_header_box.add_child(UIKit.spacer())
 	_header_box.add_child(UIKit.flat_icon_button("phone", 20, DIM))
@@ -312,7 +338,7 @@ func _render_thread(from: String) -> void:
 	pad.add_theme_constant_override("margin_bottom", 10)
 	pad.add_child(bubbles)
 	_list.add_child(pad)
-	var day_tag := UIKit.label("HOY", 11, DIM)
+	var day_tag := UIKit.label(tr("HOY"), 11, DIM)
 	day_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bubbles.add_child(day_tag)
 	for entry in thread:
@@ -324,7 +350,7 @@ func _render_thread(from: String) -> void:
 		var input := UIKit.hbox(8)
 		var box := UIKit.panel(Color("#2a3942"), 20, 8)
 		box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		box.add_child(UIKit.label("Escribe un mensaje", 15, DIM))
+		box.add_child(UIKit.label(tr("Escribe un mensaje"), 15, DIM))
 		input.add_child(box)
 		input.add_child(UIKit.icon("microphone", 22, DIM))
 		_footer.add_child(input)
@@ -333,7 +359,7 @@ func _render_thread(from: String) -> void:
 		var options := UIKit.vbox(6)
 		var can := day.can_answer()
 		if not can:
-			var why := "Deja de tocarte para contestar" if day.is_distracted else ("Espera a terminar de cambiarte" if day.changing != "" else "Vuelve a Trabajar para contestar")
+			var why := tr("Deja de tocarte para contestar") if day.is_distracted else (tr("Espera a terminar de cambiarte") if day.changing != "" else tr("Vuelve a Trabajar para contestar"))
 			var hint := UIKit.label(why, 12, UIKit.GOLD)
 			hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			options.add_child(hint)
@@ -375,22 +401,111 @@ func _bubble(entry: Dictionary) -> Control:
 	return row
 
 
+# --- Chat patrocinado ---------------------------------------------------------------
+
+## Fila del chat patrocinado, al final de la lista, con su etiqueta de publicidad.
+func _sponsor_row() -> Control:
+	var row := Button.new()
+	row.flat = true
+	row.custom_minimum_size = Vector2(0, 76)
+	row.pressed.connect(_open.bind(Ads.ID))
+	var hbox := UIKit.hbox(12)
+	hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 10)
+	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.add_child(Ads.avatar(54))
+	var text := UIKit.vbox(2)
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.alignment = BoxContainer.ALIGNMENT_CENTER
+	var name_row := UIKit.hbox(6)
+	name_row.add_child(UIKit.label(Ads.sponsor(), 19, TEXT))
+	name_row.add_child(UIKit.pill(tr("Publicidad"), DIM, 10))
+	name_row.add_child(UIKit.spacer())
+	name_row.add_child(UIKit.label(_sponsor_time, 13, Ads.LIVE if not _sponsor_seen else DIM))
+	text.add_child(name_row)
+	var preview := UIKit.label(Ads.config("phone").get("text", ""), 15, DIM)
+	preview.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_child(preview)
+	hbox.add_child(text)
+	row.add_child(hbox)
+	return row
+
+
+func _render_sponsor() -> void:
+	var back := UIKit.flat_icon_button("arrow-left", 22, TEXT)
+	back.pressed.connect(_back)
+	_header_box.add_child(back)
+	_header_box.add_child(Ads.avatar(40))
+	var who := UIKit.vbox(0)
+	who.add_child(UIKit.label(Ads.sponsor(), 19, TEXT))
+	who.add_child(UIKit.label(tr("cuenta de empresa"), 12, DIM))
+	_header_box.add_child(who)
+	_header_box.add_child(UIKit.spacer())
+
+	var bubbles := UIKit.vbox(6)
+	bubbles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var pad := MarginContainer.new()
+	for side in ["left", "right", "top", "bottom"]:
+		pad.add_theme_constant_override("margin_" + side, 10)
+	pad.add_child(bubbles)
+	_list.add_child(pad)
+	var day_tag := UIKit.label(tr("HOY"), 11, DIM)
+	day_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bubbles.add_child(day_tag)
+	var image: String = Ads.config("phone").get("image", "")
+	if image != "" and ResourceLoader.exists(image):
+		bubbles.add_child(_photo_bubble(load(image)))
+	bubbles.add_child(_bubble({"text": Ads.config("phone").get("text", ""), "mine": false, "time": _sponsor_time}))
+
+	var options := UIKit.vbox(6)
+	var cta := UIKit.icon_text_button("external-link", Ads.config("phone").get("cta", "Abrir"), Ads.LIVE, 16, 18)
+	cta.custom_minimum_size = Vector2(0, 42)
+	cta.pressed.connect(func() -> void:
+		Ads.open("phone")
+		sponsor_opened.emit())
+	options.add_child(cta)
+	var note := UIKit.label(tr("Publicidad · se abre en otra pestaña y la jornada se pausa"), 11, DIM)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	options.add_child(note)
+	_footer.add_child(options)
+	_body.scroll_vertical = 0
+
+
+## Foto recibida: burbuja de entrada con la imagen a 240 px de ancho; tocarla abre el anuncio como el botón.
+func _photo_bubble(texture: Texture2D) -> Control:
+	var row := UIKit.hbox(0)
+	var panel := UIKit.panel(BUBBLE_IN, 10, 4)
+	var pic := TextureButton.new()
+	pic.texture_normal = texture
+	pic.ignore_texture_size = true
+	pic.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
+	pic.custom_minimum_size = Vector2(240, roundf(240.0 * texture.get_height() / texture.get_width()))
+	pic.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	pic.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	pic.pressed.connect(func() -> void:
+		Ads.open("phone")
+		sponsor_opened.emit())
+	panel.add_child(pic)
+	row.add_child(panel)
+	row.add_child(UIKit.spacer())
+	return row
+
+
 # --- Notificaciones -------------------------------------------------------------------
 
 func _notify(from: String, text: String) -> void:
 	for child in _banner.get_children():
 		child.queue_free()
-	var data := Catalog.coworker(from)
 	var hbox := UIKit.hbox(10)
-	hbox.add_child(UIKit.avatar(from, 40))
+	hbox.add_child(Ads.avatar(40) if from == Ads.ID else UIKit.avatar(from, 40))
 	var body := UIKit.vbox(0)
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(UIKit.label(data.get("name", from), 15, TEXT))
+	body.add_child(UIKit.label(Ads.sponsor() if from == Ads.ID else Catalog.coworker(from).get("name", from), 15, TEXT))
 	var preview := UIKit.label(text, 13, DIM)
 	preview.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	body.add_child(preview)
 	hbox.add_child(body)
-	hbox.add_child(UIKit.label("ahora", 11, DIM))
+	hbox.add_child(UIKit.label(tr("ahora"), 11, DIM))
 	_banner.add_child(hbox)
 	var tap := Button.new()
 	tap.flat = true

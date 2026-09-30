@@ -57,7 +57,7 @@ func _ready() -> void:
 	_build()
 	day.visit_started.connect(func(id: String) -> void:
 		Sfx.play("steps")
-		_toast_show("%s se acerca a tu mesa" % Catalog.coworker(id)["name"], Color.html(Catalog.coworker(id)["color"]), "steps"))
+		_toast_show(tr("%s se acerca a tu mesa") % Catalog.coworker(id)["name"], Color.html(Catalog.coworker(id)["color"]), "steps"))
 	day.message_received.connect(func(_m: Dictionary) -> void: Sfx.play("notify"))
 	day.message_answered.connect(func(_m: Dictionary, _o: Dictionary) -> void: Sfx.play("send"))
 	day.visit_satisfied.connect(func(id: String) -> void:
@@ -65,10 +65,10 @@ func _ready() -> void:
 		_flash_color(Color(1.0, 0.6, 0.75, 0.35)))
 	day.visit_aggravated.connect(func(id: String) -> void:
 		Sfx.play("knock")
-		_toast_show("%s se está impacientando…" % Catalog.coworker(id)["name"], UIKit.BAD, "hourglass"))
+		_toast_show(tr("%s se está impacientando…") % Catalog.coworker(id)["name"], UIKit.BAD, "hourglass"))
 	day.visit_left.connect(func(id: String) -> void:
 		Sfx.play("steps", -6.0)
-		_toast_show("%s se ha ido sin esperar más." % Catalog.coworker(id)["name"], UIKit.BAD, "alert-triangle"))
+		_toast_show(tr("%s se ha ido sin esperar más.") % Catalog.coworker(id)["name"], UIKit.BAD, "alert-triangle"))
 	day.productivity_hit.connect(func(_amount: float, reason: String) -> void:
 		Sfx.play("fail")
 		_toast_show(reason, UIKit.BAD, "alert-triangle")
@@ -76,7 +76,7 @@ func _ready() -> void:
 	day.dress_check.connect(func(passed: bool) -> void:
 		if passed:
 			Sfx.play("reward")
-			_toast_show("El cliente ha pasado. Ibas presentable.", UIKit.OK, "check"))
+			_toast_show(tr("El cliente ha pasado. Ibas presentable."), UIKit.OK, "check"))
 	day.day_ended.connect(_on_day_ended)
 	day.line_spoken.connect(_on_line)
 	day.climax.connect(func(_id: String) -> void:
@@ -84,9 +84,11 @@ func _ready() -> void:
 		_flash_color(Color(1.0, 1.0, 1.0, 0.7)))
 	day.distracted.connect(func(started: bool) -> void:
 		if started:
-			_toast_show("Candela se toma un descanso… el informe puede esperar.", UIKit.HEART, "flame"))
+			_toast_show(tr("Candela se toma un descanso… el informe puede esperar."), UIKit.HEART, "flame"))
 	_phone.bind(day)
 	_phone.reply_chosen.connect(func(message: Dictionary, option: Dictionary) -> void: day.answer(message, option))
+	# El anuncio abre otra pestaña/ventana: la jornada se congela hasta que vuelva.
+	_phone.sponsor_opened.connect(_open_pause)
 	day.start(Catalog.level(level_id))
 	_scene.day = day
 	# Fundido de entrada.
@@ -128,7 +130,7 @@ func _build() -> void:
 	var actions := UIKit.panel(UIKit.BG, 16, 12)
 	var actions_box := UIKit.vbox(8)
 	actions.add_child(actions_box)
-	_mode_button = UIKit.icon_text_button("heart", "Follar", UIKit.PRIMARY, 22, 26)
+	_mode_button = UIKit.icon_text_button("heart", tr("Follar"), UIKit.PRIMARY, 22, 26)
 	_mode_button.custom_minimum_size = Vector2(0, 56)
 	_mode_button.pressed.connect(func() -> void: day.set_mode(Day.Mode.WORK if day.mode == Day.Mode.FUCK else Day.Mode.FUCK))
 	actions_box.add_child(_mode_button)
@@ -136,14 +138,14 @@ func _build() -> void:
 	_mode_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	actions_box.add_child(_mode_hint)
 	var clothes := UIKit.hbox(8)
-	_top_button = UIKit.icon_text_button("shirt", "Blusa", UIKit.PANEL_LIGHT, 18)
+	_top_button = UIKit.icon_text_button("shirt", tr("Blusa"), UIKit.PANEL_LIGHT, 18)
 	_top_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_top_button.custom_minimum_size = Vector2(0, 50)
 	_top_button.pressed.connect(func() -> void:
 		day.toggle_top()
 		if day.changing == "top":
 			Sfx.play("cloth"))
-	_bottom_button = UIKit.icon_text_button("hanger", "Falda", UIKit.PANEL_LIGHT, 18)
+	_bottom_button = UIKit.icon_text_button("hanger", tr("Falda"), UIKit.PANEL_LIGHT, 18)
 	_bottom_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_bottom_button.custom_minimum_size = Vector2(0, 50)
 	_bottom_button.pressed.connect(func() -> void:
@@ -154,10 +156,10 @@ func _build() -> void:
 	clothes.add_child(_bottom_button)
 	actions_box.add_child(clothes)
 	var states := UIKit.hbox(8)
-	_top_state = UIKit.label("puesta", 11, UIKit.TEXT_DIM)
+	_top_state = UIKit.label(tr("puesta"), 11, UIKit.TEXT_DIM)
 	_top_state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_top_state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_bottom_state = UIKit.label("puesta", 11, UIKit.TEXT_DIM)
+	_bottom_state = UIKit.label(tr("puesta"), 11, UIKit.TEXT_DIM)
 	_bottom_state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_bottom_state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	states.add_child(_top_state)
@@ -169,17 +171,17 @@ func _build() -> void:
 	var footer := UIKit.hbox(8)
 	_speed_button = UIKit.icon_text_button("player-track-next", "x1", UIKit.PANEL_LIGHT, 15, 18)
 	_speed_button.custom_minimum_size = Vector2(0, 44)
-	_speed_button.tooltip_text = "Velocidad de la jornada"
+	_speed_button.tooltip_text = tr("Velocidad de la jornada")
 	_speed_button.pressed.connect(func() -> void: day.speed = 2.0 if day.speed == 1.0 else 1.0)
 	footer.add_child(_speed_button)
-	var pause := UIKit.round_icon_button("player-pause", "Pausa (Esc): congela la jornada, no la reinicia")
+	var pause := UIKit.round_icon_button("player-pause", tr("Pausa (Esc): congela la jornada, no la reinicia"))
 	pause.pressed.connect(_open_pause)
 	footer.add_child(pause)
 	footer.add_child(UIKit.spacer())
-	var fullscreen := UIKit.round_icon_button("maximize", "Pantalla completa (F11)")
+	var fullscreen := UIKit.round_icon_button("maximize", tr("Pantalla completa (F11)"))
 	fullscreen.pressed.connect(func() -> void: Screen.set_fullscreen(not Screen.is_fullscreen()))
 	footer.add_child(fullscreen)
-	var settings := UIKit.round_icon_button("settings", "Ajustes: volumen y salir al menú")
+	var settings := UIKit.round_icon_button("settings", tr("Ajustes: volumen y salir al menú"))
 	settings.pressed.connect(_open_settings)
 	footer.add_child(settings)
 	column.add_child(footer)
@@ -209,13 +211,13 @@ func _build() -> void:
 	_hud_clock = UIKit.bold("09:00", 28)
 	hud_top.add_child(_hud_clock)
 	hud_top.add_child(UIKit.spacer())
-	_hud_left = UIKit.label("quedan 8 h", 12, UIKit.TEXT_DIM)
+	_hud_left = UIKit.label(tr("quedan 8 h"), 12, UIKit.TEXT_DIM)
 	_hud_left.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hud_top.add_child(_hud_left)
 	hud_box.add_child(hud_top)
 	var report_row := UIKit.hbox(8)
 	report_row.add_child(UIKit.icon("file-text", 16, UIKit.GOLD))
-	report_row.add_child(UIKit.label("Informe", 13, UIKit.TEXT_DIM))
+	report_row.add_child(UIKit.label(tr("Informe"), 13, UIKit.TEXT_DIM))
 	report_row.add_child(UIKit.spacer())
 	_hud_report_label = UIKit.bold("0 %", 13, UIKit.GOLD)
 	report_row.add_child(_hud_report_label)
@@ -224,7 +226,7 @@ func _build() -> void:
 	hud_box.add_child(_hud_report_bar)
 	var prod_row := UIKit.hbox(8)
 	prod_row.add_child(UIKit.icon("briefcase", 16, UIKit.OK))
-	prod_row.add_child(UIKit.label("Productividad", 13, UIKit.TEXT_DIM))
+	prod_row.add_child(UIKit.label(tr("Productividad"), 13, UIKit.TEXT_DIM))
 	prod_row.add_child(UIKit.spacer())
 	_hud_pips = UIKit.hbox(3)
 	for i: int in 10:
@@ -319,21 +321,21 @@ func _refresh() -> void:
 	var solo := day.visitor.is_empty()
 	var exposed := not day.top_on or not day.bottom_on
 	# Acción principal.
-	var label := "Volver al informe"
+	var label := tr("Volver al informe")
 	var icon := "briefcase"
-	var hint := "Ella deja el portátil: el informe no avanza"
+	var hint := tr("Ella deja el portátil: el informe no avanza")
 	if day.mode != Day.Mode.FUCK:
 		icon = "heart"
 		if solo:
 			if exposed:
-				label = "Tocarse · %s" % ("tetas" if not day.top_on and day.bottom_on else ("suave" if day.top_on else "a fondo"))
-				hint = "Sola y desvestida: se toca y no trabaja"
+				label = tr("Tocarse · %s") % (tr("tetas") if not day.top_on and day.bottom_on else (tr("suave") if day.top_on else tr("a fondo")))
+				hint = tr("Sola y desvestida: se toca y no trabaja")
 			else:
-				label = "Follar"
-				hint = "Nadie en la mesa. Quítate algo o espera visita"
+				label = tr("Follar")
+				hint = tr("Nadie en la mesa. Quítate algo o espera visita")
 		else:
-			label = "Dejar el informe · %s" % Day.act_label(day.current_act())
-			hint = ("%s la está tocando mientras teclea" % Catalog.coworker(day.visitor["id"])["name"]) if day.is_touching() else "Sigue trabajando mientras él espera"
+			label = tr("Dejar el informe · %s") % Day.act_label(day.current_act())
+			hint = (tr("%s la está tocando mientras teclea") % Catalog.coworker(day.visitor["id"])["name"]) if day.is_touching() else tr("Sigue trabajando mientras él espera")
 	_mode_button.text = label
 	_mode_button.icon = load(UIKit.ICON_DIR + icon + ".svg")
 	_mode_button.disabled = day.changing != "" or (solo and not exposed)
@@ -347,7 +349,7 @@ func _refresh() -> void:
 		b.add_theme_color_override("icon_hover_color", tint)
 		b.add_theme_color_override("font_color", tint)
 		b.add_theme_color_override("font_hover_color", tint)
-		st.text = "cambiando…" if pair[3] else ("puesta" if pair[2] else "quitada")
+		st.text = tr("cambiando…") if pair[3] else (tr("puesta") if pair[2] else tr("quitada"))
 		st.add_theme_color_override("font_color", tint)
 	_top_button.disabled = day.changing != ""
 	_bottom_button.disabled = day.changing != ""
@@ -365,7 +367,7 @@ func _refresh() -> void:
 func _refresh_hud() -> void:
 	_hud_clock.text = Catalog.format_clock(day.clock)
 	var left := day.minutes_left()
-	_hud_left.text = "quedan %dh %02dm" % [int(left) / 60, int(left) % 60] if left >= 60.0 else "quedan %d min" % int(left)
+	_hud_left.text = tr("quedan %dh %02dm") % [int(left) / 60, int(left) % 60] if left >= 60.0 else tr("quedan %d min") % int(left)
 	_hud_left.add_theme_color_override("font_color", UIKit.BAD if left < 60.0 and not day.finished else UIKit.TEXT_DIM)
 	_hud_report_label.text = "%.0f %%" % day.report
 	_hud_report_bar.value = day.report
@@ -377,25 +379,26 @@ func _refresh_hud() -> void:
 			var lit := day.productivity >= i + 0.5
 			pip.color = (UIKit.OK if day.productivity > 4.0 else UIKit.GOLD) if lit else Color(UIKit.BAD, 0.45)
 	# Píldora de estado.
-	var state := "Trabajando"
+	var state := tr("Trabajando")
 	var color := UIKit.OK
 	if day.changing != "":
-		state = "Cambiándose…"
+		state = tr("Cambiándose…")
 		color = UIKit.GOLD
 	elif day.climaxing != "":
 		state = "…"
 		color = UIKit.HEART
 	elif day.is_distracted:
-		state = "Tocándose · productividad 0"
+		state = tr("Tocándose · productividad 0")
 		color = UIKit.HEART
 	elif day.mode == Day.Mode.FUCK and not day.visitor.is_empty():
-		state = "Follando · el informe espera"
+		state = tr("Follando · el informe espera")
 		color = UIKit.HEART
 	elif day.is_touching():
-		state = "Trabajando mientras la tocan"
+		state = tr("Trabajando mientras la tocan")
 		color = UIKit.GOLD
 	elif not day.pending_messages.is_empty():
-		state = "%d mensaje%s sin contestar" % [day.pending_messages.size(), "" if day.pending_messages.size() == 1 else "s"]
+		var n := day.pending_messages.size()
+		state = (tr("%d mensaje sin contestar") if n == 1 else tr("%d mensajes sin contestar")) % n
 		color = UIKit.GOLD
 	if _hud_state.get_child_count() == 0 or (_hud_state.get_child(0) as Label).text != state:
 		for child in _hud_state.get_children():
@@ -412,7 +415,7 @@ func _refresh_visitor() -> void:
 			_visitor_box.set_meta("mode", "queue")
 			var row := UIKit.hbox(8)
 			row.add_child(UIKit.icon("hourglass", 18, UIKit.TEXT_DIM))
-			row.add_child(UIKit.label("%s viene de camino…" % Catalog.coworker(day.queue[0])["name"], 15, UIKit.TEXT_DIM))
+			row.add_child(UIKit.label(tr("%s viene de camino…") % Catalog.coworker(day.queue[0])["name"], 15, UIKit.TEXT_DIM))
 			_visitor_box.add_child(row)
 		return
 	_visitor_panel.visible = true
@@ -430,7 +433,7 @@ func _refresh_visitor() -> void:
 		who.add_child(UIKit.bold(data["name"], 20, Color.html(data["color"]).lightened(0.35)))
 		var wants: Dictionary = data.get("wants", {})
 		var wanted_act := Day.act_for(bool(wants.get("top", true)), bool(wants.get("bottom", true)))
-		_visitor_wants = UIKit.label("quiere: %s" % Day.act_label(wanted_act), 13, UIKit.TEXT_DIM)
+		_visitor_wants = UIKit.label(tr("quiere: %s") % Day.act_label(wanted_act), 13, UIKit.TEXT_DIM)
 		who.add_child(_visitor_wants)
 		head.add_child(who)
 		_visitor_queue = UIKit.bold("", 12, UIKit.BAD)
@@ -449,12 +452,12 @@ func _refresh_visitor() -> void:
 		_visitor_status = UIKit.label("", 12, UIKit.TEXT_DIM)
 		_visitor_box.add_child(_visitor_status)
 	_visitor_wants.add_theme_color_override("font_color", UIKit.OK if day.wants_met(data) else UIKit.TEXT_DIM)
-	_visitor_queue.text = "+%d esperando" % day.queue.size() if not day.queue.is_empty() else ""
+	_visitor_queue.text = tr("+%d esperando") % day.queue.size() if not day.queue.is_empty() else ""
 	_visitor_arousal.value = day.visitor["arousal"]
 	var aggravated: bool = day.visitor.get("aggravated", false)
 	_visitor_patience.value = clampf(1.0 - day.visitor["waited"] / float(data["patience"]), 0.0, 1.0) * 100.0
 	(_visitor_patience.get_theme_stylebox("fill") as StyleBoxFlat).bg_color = UIKit.BAD if aggravated else UIKit.GOLD
-	var status := "¡impaciente!" if aggravated else ("disfrutando" if day.mode == Day.Mode.FUCK or day.is_touching() else "esperando")
+	var status := tr("¡impaciente!") if aggravated else (tr("disfrutando") if day.mode == Day.Mode.FUCK or day.is_touching() else tr("esperando"))
 	_visitor_status.text = "%d %% · %s" % [int(day.visitor["arousal"]), status]
 	_visitor_status.add_theme_color_override("font_color", UIKit.BAD if aggravated else UIKit.TEXT_DIM)
 
@@ -538,7 +541,7 @@ func _close_overlay() -> void:
 	get_tree().paused = false
 
 
-## Pausa: solo congela. "Seguir" retoma exactamente donde estaba.
+## Pausa: solo congela. tr("Seguir") retoma exactamente donde estaba.
 func _open_pause() -> void:
 	if _overlay_node or day.finished:
 		return
@@ -546,10 +549,10 @@ func _open_pause() -> void:
 	var head := UIKit.hbox(10)
 	head.alignment = BoxContainer.ALIGNMENT_CENTER
 	head.add_child(UIKit.icon("player-pause", 30, UIKit.TEXT))
-	head.add_child(UIKit.title("Pausa", 36))
+	head.add_child(UIKit.title(tr("Pausa"), 36))
 	box.add_child(head)
-	box.add_child(UIKit.title("%s · informe %.0f %% · %d atendidos" % [Catalog.format_clock(day.clock), day.report, day.satisfied_count], 14))
-	var resume := UIKit.icon_text_button("player-play", "Seguir", UIKit.PRIMARY, 22, 24)
+	box.add_child(UIKit.title(tr("%s · informe %.0f %% · %d atendidos") % [Catalog.format_clock(day.clock), day.report, day.satisfied_count], 14))
+	var resume := UIKit.icon_text_button("player-play", tr("Seguir"), UIKit.PRIMARY, 22, 24)
 	resume.pressed.connect(_close_overlay)
 	box.add_child(resume)
 
@@ -562,9 +565,9 @@ func _open_settings() -> void:
 	var head := UIKit.hbox(10)
 	head.alignment = BoxContainer.ALIGNMENT_CENTER
 	head.add_child(UIKit.icon("settings", 30, UIKit.TEXT))
-	head.add_child(UIKit.title("Ajustes", 36))
+	head.add_child(UIKit.title(tr("Ajustes"), 36))
 	box.add_child(head)
-	for pair in [["Escena", Sfx.scene_volume, Sfx.set_scene_volume], ["Interfaz", Sfx.ui_volume, Sfx.set_ui_volume], ["Música", Sfx.music_volume, Sfx.set_music_volume]]:
+	for pair in [[tr("Escena"), Sfx.scene_volume, Sfx.set_scene_volume], [tr("Interfaz"), Sfx.ui_volume, Sfx.set_ui_volume], [tr("Música"), Sfx.music_volume, Sfx.set_music_volume]]:
 		var row := UIKit.hbox(10)
 		var name := UIKit.label(pair[0], 14, UIKit.TEXT_DIM)
 		name.custom_minimum_size = Vector2(80, 0)
@@ -579,13 +582,13 @@ func _open_settings() -> void:
 		slider.value_changed.connect(func(v: float) -> void: (pair[2] as Callable).call(v))
 		row.add_child(slider)
 		box.add_child(row)
-	var fullscreen := UIKit.icon_text_button("maximize", "Pantalla completa (F11)", UIKit.PANEL_LIGHT, 16)
+	var fullscreen := UIKit.icon_text_button("maximize", tr("Pantalla completa (F11)"), UIKit.PANEL_LIGHT, 16)
 	fullscreen.pressed.connect(func() -> void: Screen.set_fullscreen(not Screen.is_fullscreen()))
 	box.add_child(fullscreen)
-	var back := UIKit.icon_text_button("player-play", "Volver a la jornada", UIKit.PRIMARY, 20, 22)
+	var back := UIKit.icon_text_button("player-play", tr("Volver a la jornada"), UIKit.PRIMARY, 20, 22)
 	back.pressed.connect(_close_overlay)
 	box.add_child(back)
-	var quit := UIKit.button("Abandonar la jornada", UIKit.PANEL_LIGHT, 16)
+	var quit := UIKit.button(tr("Abandonar la jornada"), UIKit.PANEL_LIGHT, 16)
 	quit.pressed.connect(func() -> void:
 		_close_overlay()
 		_confirm_quit())
@@ -594,12 +597,12 @@ func _open_settings() -> void:
 
 func _confirm_quit() -> void:
 	var box := _open_overlay(420.0)
-	box.add_child(UIKit.title("¿Abandonar la jornada?", 30))
-	box.add_child(UIKit.title("Se pierde el progreso de hoy (informe %.0f %%)." % day.report, 14))
-	var stay := UIKit.button("Seguir jugando", UIKit.PRIMARY)
+	box.add_child(UIKit.title(tr("¿Abandonar la jornada?"), 30))
+	box.add_child(UIKit.title(tr("Se pierde el progreso de hoy (informe %.0f %%).") % day.report, 14))
+	var stay := UIKit.button(tr("Seguir jugando"), UIKit.PRIMARY)
 	stay.pressed.connect(_close_overlay)
 	box.add_child(stay)
-	var quit := UIKit.button("Salir al menú", UIKit.PANEL_LIGHT)
+	var quit := UIKit.button(tr("Salir al menú"), UIKit.PANEL_LIGHT)
 	quit.pressed.connect(func() -> void:
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
@@ -634,29 +637,32 @@ func _on_day_ended(won: bool, stars: int) -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if has_art:
-		center.anchor_top = 0.45
+		# Con el banner de publicidad el panel es más alto: sube para no salirse por abajo.
+		center.anchor_top = 0.3 if Ads.enabled() else 0.45
 	overlay.add_child(center)
 	var card := UIKit.panel(Color(UIKit.PANEL, 0.92), 20, 28)
 	var box := UIKit.vbox(12)
 	box.custom_minimum_size = Vector2(560, 0)
 	card.add_child(box)
-	box.add_child(UIKit.title("Informe entregado" if won else "Se acabó la jornada", 40))
+	box.add_child(UIKit.title(tr("Informe entregado") if won else tr("Se acabó la jornada"), 40))
 	box.add_child(UIKit.stars(stars, 3, 44))
-	box.add_child(UIKit.title("Informe %.0f %% · %d compañeros atendidos · %d cabreados" % [day.report, day.satisfied_count, day.aggravated_count], 18))
+	box.add_child(UIKit.title(tr("Informe %.0f %% · %d compañeros atendidos · %d cabreados") % [day.report, day.satisfied_count, day.aggravated_count], 18))
 	if won:
 		var reward := UIKit.hbox(6)
 		reward.alignment = BoxContainer.ALIGNMENT_CENTER
 		reward.add_child(UIKit.icon("heart-filled", 22, UIKit.HEART))
-		reward.add_child(UIKit.bold("+%d corazones" % (10 * stars), 22, UIKit.HEART))
+		reward.add_child(UIKit.bold(tr("+%d corazones") % (10 * stars), 22, UIKit.HEART))
 		box.add_child(reward)
 	var buttons := UIKit.hbox(10)
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
-	var again := UIKit.icon_text_button("player-play", "Otra jornada", UIKit.PRIMARY, 20, 22)
+	var again := UIKit.icon_text_button("player-play", tr("Otra jornada"), UIKit.PRIMARY, 20, 22)
 	again.pressed.connect(func() -> void: get_tree().reload_current_scene())
 	buttons.add_child(again)
-	var menu := UIKit.button("Menú", UIKit.PANEL_LIGHT)
+	var menu := UIKit.button(tr("Menú"), UIKit.PANEL_LIGHT)
 	menu.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	buttons.add_child(menu)
 	box.add_child(buttons)
+	if Ads.enabled():
+		box.add_child(Ads.banner("end_win" if won else "end_lose", 560.0))
 	center.add_child(card)
 	add_child(overlay)

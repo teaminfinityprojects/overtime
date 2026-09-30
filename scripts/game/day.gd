@@ -124,8 +124,8 @@ func _fire_events() -> void:
 			dress_check.emit(passed)
 			Metrics.track("dress_check", {"passed": passed, "clock": Catalog.format_clock(clock)})
 			if not passed:
-				_hit(3.0, "El jefe te ha pillado sin ropa delante del cliente.")
-				_deliver({"from": "boss", "text": "¿¡Pero qué haces así vestida!? Ese informe ya no es lo único que está en juego.", "options": [{"label": "Lo siento…", "effects": {}}]})
+				_hit(3.0, tr("El jefe te ha pillado sin ropa delante del cliente."))
+				_deliver({"from": "boss", "text": tr("¿¡Pero qué haces así vestida!? Ese informe ya no es lo único que está en juego."), "options": [{"label": tr("Lo siento…"), "effects": {}}]})
 
 
 func _deliver(message: Dictionary) -> void:
@@ -267,8 +267,8 @@ func _leave_angry() -> void:
 	visitor = {}
 	if queue.is_empty():
 		mode = Mode.WORK
-	_hit(1.0, "%s se ha ido cabreado." % Catalog.coworker(id)["name"])
-	line_spoken.emit(id, Catalog.coworker(id).get("leave", "Ya veo cómo va esto."))
+	_hit(1.0, tr("%s se ha ido cabreado.") % Catalog.coworker(id)["name"])
+	line_spoken.emit(id, Catalog.coworker(id).get("leave", tr("Ya veo cómo va esto.")))
 	visit_left.emit(id)
 	_schedule_chatter(id, "angry", 3.0 + randf() * 4.0)
 	Metrics.track("visit_left", {"coworker": id})
@@ -294,9 +294,9 @@ func current_act() -> String:
 
 static func act_label(act: String) -> String:
 	match act:
-		"oral": return "oral"
-		"titjob": return "con las tetas"
-		_: return "sexo"
+		"oral": return L10n.t("oral")
+		"titjob": return L10n.t("con las tetas")
+		_: return L10n.t("sexo")
 
 
 func wants_met(data: Dictionary) -> bool:

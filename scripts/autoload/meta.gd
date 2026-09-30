@@ -25,7 +25,7 @@ func record_day(level_id: String, won: bool, stars: int, report: float, satisfie
 	var previous: Dictionary = best.get(level_id, {})
 	if won and stars >= int(previous.get("stars", 0)):
 		best[level_id] = {"stars": stars, "report": report, "satisfied": satisfied}
-	Metrics.track("day_end", {"level": level_id, "won": won, "stars": stars, "report": report, "satisfied": satisfied})
+	Metrics.track("day_end", {"level": level_id, "won": won, "stars": stars, "report": snappedf(report, 0.1), "satisfied": satisfied})
 	if won:
 		hearts += 10 * stars
 	save_game()

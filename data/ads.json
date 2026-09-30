@@ -1,0 +1,47 @@
+{
+  "sponsor": {"es": "amateur.tv", "en": "sugarcams"},
+  "url": {"es": "https://es.amateur.tv/", "en": "https://www.sugarcams.com/"},
+  "destination": {"es": "amateur", "en": "sugarcams"},
+  "tracking": {
+    "utm_medium": "overtime"
+  },
+  "variant": "c",
+  "banners": {
+    "a": {
+      "menu": {"es": "res://assets/ads/menu_a.png", "en": "res://assets/ads/menu_a_en.png"},
+      "end_win": {"es": "res://assets/ads/end_win_a.png", "en": "res://assets/ads/end_win_a_en.png"},
+      "end_lose": {"es": "res://assets/ads/end_lose_a.png", "en": "res://assets/ads/end_lose_a_en.png"}
+    },
+    "b": {
+      "menu": {"es": "res://assets/ads/menu_b.png", "en": "res://assets/ads/menu_b_en.png"},
+      "end_win": {"es": "res://assets/ads/end_win_b.png", "en": "res://assets/ads/end_win_b_en.png"},
+      "end_lose": {"es": "res://assets/ads/end_lose_b.png", "en": "res://assets/ads/end_lose_b_en.png"}
+    },
+    "c": {
+      "menu": {"es": "res://assets/ads/menu_c.png", "en": "res://assets/ads/menu_c_en.png"},
+      "end_win": {"es": "res://assets/ads/end_win_c.png", "en": "res://assets/ads/end_win_c_en.png"},
+      "end_lose": {"es": "res://assets/ads/end_lose_c.png", "en": "res://assets/ads/end_lose_c_en.png"}
+    }
+  },
+  "menu": {
+    "title": {"es": "Chicas reales, en directo", "en": "Real girls, live"},
+    "text": {"es": "Si Candela te sabe a poco, en amateur.tv hay cams abiertas ahora mismo.", "en": "If Candela isn't enough, there are cams open on sugarcams right now."},
+    "cta": {"es": "Ver directos", "en": "Watch live"}
+  },
+  "end_win": {
+    "title": {"es": "Informe entregado. ¿Y ahora qué?", "en": "Report delivered. Now what?"},
+    "text": {"es": "La oficina cierra, amateur.tv no. Chicas en directo esperando.", "en": "The office closes, sugarcams doesn't. Live girls waiting."},
+    "cta": {"es": "Entrar en amateur.tv", "en": "Go to sugarcams"}
+  },
+  "end_lose": {
+    "title": {"es": "Mal día en la oficina", "en": "Rough day at the office"},
+    "text": {"es": "Desconecta un rato: chicas reales en directo en amateur.tv.", "en": "Unwind for a bit: real girls live on sugarcams."},
+    "cta": {"es": "Entrar en amateur.tv", "en": "Go to sugarcams"}
+  },
+  "phone": {
+    "at": "13:05",
+    "text": {"es": "🔴 Pausa para comer: hay chicas en directo ahora mismo. ¿Te asomas?", "en": "🔴 Lunch break: there are girls live right now. Want a peek?"},
+    "cta": {"es": "Abrir amateur.tv", "en": "Open sugarcams"},
+    "image": "res://assets/ads/phone_c.png"
+  }
+}

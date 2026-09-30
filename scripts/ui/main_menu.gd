@@ -5,6 +5,7 @@ extends Control
 const SPLASH := "res://assets/ui/title_splash.png"
 const LOGO := "res://assets/ui/logo.png"
 const COLUMN_WIDTH := 400.0
+const AD_WIDTH := 360.0
 
 
 func _ready() -> void:
@@ -38,12 +39,12 @@ func _ready() -> void:
 		title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 		title.add_theme_constant_override("outline_size", 10)
 		column.add_child(title)
-	var subtitle := UIKit.label("Termina el informe. Atiende a la oficina.", 20, UIKit.TEXT_DIM)
+	var subtitle := UIKit.label(tr("Termina el informe. Atiende a la oficina."), 20, UIKit.TEXT_DIM)
 	column.add_child(subtitle)
 	var hearts := UIKit.hbox(6)
 	hearts.add_child(UIKit.icon("heart-filled", 20, UIKit.HEART))
 	hearts.add_child(UIKit.bold(str(Meta.hearts), 20, UIKit.HEART))
-	hearts.add_child(UIKit.label("corazones", 14, UIKit.TEXT_DIM))
+	hearts.add_child(UIKit.label(tr("corazones"), 14, UIKit.TEXT_DIM))
 	column.add_child(hearts)
 	column.add_child(_gap(10))
 
@@ -56,17 +57,19 @@ func _ready() -> void:
 		button.custom_minimum_size = Vector2(0, 60)
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.disabled = not unlocked
-		button.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/game.tscn"))
+		button.pressed.connect(func() -> void:
+			Metrics.click("play", {"level": id, "lang": L10n.lang})
+			get_tree().change_scene_to_file("res://scenes/game.tscn"))
 		column.add_child(button)
 		if n_stars > 0:
 			var row := UIKit.hbox(8)
 			row.add_child(UIKit.stars(n_stars, 3, 18))
-			row.add_child(UIKit.label("mejor jornada · informe %.0f %%" % float(best.get("report", 0.0)), 12, UIKit.TEXT_DIM))
+			row.add_child(UIKit.label(tr("mejor jornada · informe %.0f %%") % float(best.get("report", 0.0)), 12, UIKit.TEXT_DIM))
 			column.add_child(row)
 	column.add_child(_gap(6))
 
 	# Los ajustes (volumen, pantalla completa) viven en el juego (⚙); aquí solo lo esencial.
-	var quit := UIKit.icon_text_button("x", "Salir del juego", UIKit.PANEL, 14)
+	var quit := UIKit.icon_text_button("x", tr("Salir del juego"), UIKit.PANEL, 14)
 	quit.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	quit.pressed.connect(func() -> void: get_tree().quit())
 	column.add_child(quit)
@@ -76,6 +79,19 @@ func _ready() -> void:
 			Meta.reset()
 			get_tree().reload_current_scene())
 		column.add_child(reset)
+	# Publicidad en la esquina inferior derecha, fuera de la columna del menú.
+	if Ads.enabled():
+		var ad := Ads.banner("menu", AD_WIDTH)
+		var ad_size := ad.get_combined_minimum_size()
+		ad.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		ad.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		ad.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		ad.offset_right = -24
+		ad.offset_bottom = -24
+		ad.offset_left = -24 - ad_size.x
+		ad.offset_top = -24 - ad_size.y
+		add_child(ad)
+	_language_switch()
 	var version := UIKit.label("v%s · +18 · TeamSquad" % ProjectSettings.get_setting("application/config/version", "0.1"), 12, UIKit.TEXT_DIM)
 	column.add_child(version)
 
@@ -115,6 +131,30 @@ func _backdrop() -> void:
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
 	move_child(shade, 2)
+
+
+## Selector de idioma arriba a la derecha: ES / EN. Al cambiar, Catalog recarga los datos y el menú se rehace.
+func _language_switch() -> void:
+	var row := UIKit.hbox(4)
+	row.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	row.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	row.offset_right = -24
+	row.offset_top = 24
+	row.tooltip_text = tr("Idioma")
+	for code: String in L10n.LANGS:
+		var active := code == L10n.lang
+		var button := UIKit.button(code.to_upper(), UIKit.PRIMARY if active else UIKit.PANEL, 14)
+		button.custom_minimum_size = Vector2(52, 36)
+		button.tooltip_text = tr("Idioma")
+		button.pressed.connect(func() -> void:
+			if code == L10n.lang:
+				return
+			Metrics.click("lang", {"lang": code})
+			L10n.set_lang(code)
+			get_tree().reload_current_scene())
+		row.add_child(button)
+	add_child(row)
+	row.offset_left = row.offset_right - row.get_combined_minimum_size().x
 
 
 func _gap(height: float) -> Control:

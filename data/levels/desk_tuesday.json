@@ -1,7 +1,13 @@
 {
   "id": "desk_tuesday",
-  "name": "Martes · Mesa",
-  "location": "Oficina abierta, tu mesa",
+  "name": {
+    "es": "Martes · Mesa",
+    "en": "Tuesday · Desk"
+  },
+  "location": {
+    "es": "Oficina abierta, tu mesa",
+    "en": "Open-plan office, your desk"
+  },
   "start": "09:00",
   "end": "17:00",
   "seconds_per_game_minute": 1.25,
@@ -12,10 +18,16 @@
       "at": "09:02",
       "type": "message",
       "from": "boss",
-      "text": "Candela, el informe trimestral tiene que estar en mi mesa a las 17:00. Sin excusas.",
+      "text": {
+        "es": "Candela, el informe trimestral tiene que estar en mi mesa a las 17:00. Sin excusas.",
+        "en": "Candela, the quarterly report has to be on my desk by 5:00 pm. No excuses."
+      },
       "options": [
         {
-          "label": "Cuenta con ello.",
+          "label": {
+            "es": "Cuenta con ello.",
+            "en": "Count on it."
+          },
           "effects": {}
         }
       ]
@@ -24,17 +36,26 @@
       "at": "09:10",
       "type": "message",
       "from": "mario",
-      "text": "Buenos días 😏 ¿Café? Paso en un rato a por el mío… y a verte.",
+      "text": {
+        "es": "Buenos días 😏 ¿Café? Paso en un rato a por el mío… y a verte.",
+        "en": "Morning 😏 Coffee? I'll swing by for mine in a bit… and to see you."
+      },
       "options": [
         {
-          "label": "Trae dos.",
+          "label": {
+            "es": "Trae dos.",
+            "en": "Bring two."
+          },
           "effects": {
             "visit_delay": -6,
             "productivity": 1
           }
         },
         {
-          "label": "Estoy liada, Mario.",
+          "label": {
+            "es": "Estoy liada, Mario.",
+            "en": "I'm swamped, Mario."
+          },
           "effects": {
             "reject": true
           }
@@ -50,16 +71,25 @@
       "at": "09:50",
       "type": "message",
       "from": "dani",
-      "text": "He visto a Mario salir de tu mesa con cara de tonto 👀 ¿Qué me he perdido?",
+      "text": {
+        "es": "He visto a Mario salir de tu mesa con cara de tonto 👀 ¿Qué me he perdido?",
+        "en": "I saw Mario leave your desk with a goofy grin 👀 What did I miss?"
+      },
       "options": [
         {
-          "label": "Ven y lo descubres.",
+          "label": {
+            "es": "Ven y lo descubres.",
+            "en": "Come and find out."
+          },
           "effects": {
             "visit_delay": -10
           }
         },
         {
-          "label": "Nada, un café.",
+          "label": {
+            "es": "Nada, un café.",
+            "en": "Nothing, just coffee."
+          },
           "effects": {}
         }
       ]
@@ -74,20 +104,32 @@
       "at": "10:15",
       "type": "message",
       "from": "dani",
-      "text": "Te veo desde mi sitio. Esa falda es un crimen contra la productividad 🔥",
+      "text": {
+        "es": "Te veo desde mi sitio. Esa falda es un crimen contra la productividad 🔥",
+        "en": "I can see you from my seat. That skirt is a crime against productivity 🔥"
+      },
       "options": [
         {
-          "label": "Ven a denunciarlo en persona.",
+          "label": {
+            "es": "Ven a denunciarlo en persona.",
+            "en": "Come report it in person."
+          },
           "effects": {
             "visit_delay": -8
           }
         },
         {
-          "label": "Jaja, a trabajar.",
+          "label": {
+            "es": "Jaja, a trabajar.",
+            "en": "Haha, back to work."
+          },
           "effects": {}
         },
         {
-          "label": "Déjame en paz.",
+          "label": {
+            "es": "Déjame en paz.",
+            "en": "Leave me alone."
+          },
           "effects": {
             "reject": true
           }
@@ -109,21 +151,33 @@
       "at": "11:05",
       "type": "message",
       "from": "mario",
-      "text": "Lo de antes no me lo saco de la cabeza. Después de comer repetimos, ¿no?",
+      "text": {
+        "es": "Lo de antes no me lo saco de la cabeza. Después de comer repetimos, ¿no?",
+        "en": "I can't get earlier out of my head. Round two after lunch, right?"
+      },
       "options": [
         {
-          "label": "Tráete otro café.",
+          "label": {
+            "es": "Tráete otro café.",
+            "en": "Bring another coffee."
+          },
           "effects": {
             "visit_delay": -15,
             "productivity": 1
           }
         },
         {
-          "label": "Ya veremos.",
+          "label": {
+            "es": "Ya veremos.",
+            "en": "We'll see."
+          },
           "effects": {}
         },
         {
-          "label": "Se acabó, Mario.",
+          "label": {
+            "es": "Se acabó, Mario.",
+            "en": "That's it, Mario."
+          },
           "effects": {
             "reject": true
           }
@@ -134,10 +188,16 @@
       "at": "11:30",
       "type": "message",
       "from": "boss",
-      "text": "A las 12:00 pasa un cliente por la planta. Que os vea PRESENTABLES.",
+      "text": {
+        "es": "A las 12:00 pasa un cliente por la planta. Que os vea PRESENTABLES.",
+        "en": "A client is coming through the floor at 12:00. I want you all PRESENTABLE."
+      },
       "options": [
         {
-          "label": "Entendido.",
+          "label": {
+            "es": "Entendido.",
+            "en": "Understood."
+          },
           "effects": {}
         }
       ],
@@ -152,10 +212,16 @@
       "at": "12:10",
       "type": "message",
       "from": "boss",
-      "text": "El cliente se ha ido. Ahora sí: quiero ver avances en ese informe.",
+      "text": {
+        "es": "El cliente se ha ido. Ahora sí: quiero ver avances en ese informe.",
+        "en": "The client is gone. Now then: I want to see progress on that report."
+      },
       "options": [
         {
-          "label": "Voy a ello.",
+          "label": {
+            "es": "Voy a ello.",
+            "en": "On it."
+          },
           "effects": {}
         }
       ]
@@ -175,16 +241,25 @@
       "at": "13:15",
       "type": "message",
       "from": "sergio",
-      "text": "Lo de esta mañana me ha dejado con ganas de más. ¿Después de comer?",
+      "text": {
+        "es": "Lo de esta mañana me ha dejado con ganas de más. ¿Después de comer?",
+        "en": "This morning left me wanting more. After lunch?"
+      },
       "options": [
         {
-          "label": "Te espero.",
+          "label": {
+            "es": "Te espero.",
+            "en": "I'll be waiting."
+          },
           "effects": {
             "visit_delay": -10
           }
         },
         {
-          "label": "Hoy no puedo, en serio.",
+          "label": {
+            "es": "Hoy no puedo, en serio.",
+            "en": "I can't today, seriously."
+          },
           "effects": {
             "reject": true
           }
@@ -195,16 +270,25 @@
       "at": "13:45",
       "type": "message",
       "from": "mario",
-      "text": "¿Comes en la mesa? Yo también. Paso a las tres.",
+      "text": {
+        "es": "¿Comes en la mesa? Yo también. Paso a las tres.",
+        "en": "Eating at your desk? Me too. I'll come by at three."
+      },
       "options": [
         {
-          "label": "Te espero con hambre.",
+          "label": {
+            "es": "Te espero con hambre.",
+            "en": "I'll be waiting, hungry."
+          },
           "effects": {
             "visit_delay": -8
           }
         },
         {
-          "label": "Come tranquilo.",
+          "label": {
+            "es": "Come tranquilo.",
+            "en": "Enjoy your lunch."
+          },
           "effects": {}
         }
       ]
@@ -241,16 +325,25 @@
       "at": "15:35",
       "type": "message",
       "from": "dani",
-      "text": "Última hora y todavía tecleando. Voy a darte un motivo para parar un rato.",
+      "text": {
+        "es": "Última hora y todavía tecleando. Voy a darte un motivo para parar un rato.",
+        "en": "Last hour and still typing. I'm going to give you a reason to take a break."
+      },
       "options": [
         {
-          "label": "Corre.",
+          "label": {
+            "es": "Corre.",
+            "en": "Hurry."
+          },
           "effects": {
             "visit_delay": -10
           }
         },
         {
-          "label": "Ni se te ocurra, tengo que acabar.",
+          "label": {
+            "es": "Ni se te ocurra, tengo que acabar.",
+            "en": "Don't you dare, I have to finish."
+          },
           "effects": {
             "reject": true
           }
@@ -261,10 +354,16 @@
       "at": "15:50",
       "type": "message",
       "from": "boss",
-      "text": "¿Cómo va ese informe? Te quiero ver concentrada.",
+      "text": {
+        "es": "¿Cómo va ese informe? Te quiero ver concentrada.",
+        "en": "How's that report going? I want to see you focused."
+      },
       "options": [
         {
-          "label": "Casi listo.",
+          "label": {
+            "es": "Casi listo.",
+            "en": "Almost done."
+          },
           "effects": {}
         }
       ],
@@ -285,16 +384,25 @@
       "at": "16:40",
       "type": "message",
       "from": "sergio",
-      "text": "Sé que estás acabando. Por eso vengo ahora.",
+      "text": {
+        "es": "Sé que estás acabando. Por eso vengo ahora.",
+        "en": "I know you're wrapping up. That's why I'm coming now."
+      },
       "options": [
         {
-          "label": "Ven.",
+          "label": {
+            "es": "Ven.",
+            "en": "Come."
+          },
           "effects": {
             "visit_delay": -5
           }
         },
         {
-          "label": "Hoy no, Sergio.",
+          "label": {
+            "es": "Hoy no, Sergio.",
+            "en": "Not today, Sergio."
+          },
           "effects": {
             "reject": true
           }

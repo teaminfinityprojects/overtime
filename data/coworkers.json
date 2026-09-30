@@ -1,6 +1,9 @@
 {
   "boss": {
-    "name": "Jefe",
+    "name": {
+      "es": "Jefe",
+      "en": "Boss"
+    },
     "kind": "boss",
     "color": "#c0392b",
     "look": "middle aged man, grey hair, thick grey mustache, dark navy suit jacket, red tie, stern frown, reading glasses",
@@ -14,19 +17,40 @@
       "top": false,
       "bottom": true
     },
-    "act": "te folla las tetas mientras tecleas",
+    "act": {
+      "es": "te folla las tetas mientras tecleas",
+      "en": "fucks your tits while you type"
+    },
     "arousal_rate": 9.0,
     "arousal_rate_unmet": 2.5,
     "patience": 30.0,
     "on_reject": "aggravate",
     "brings": "dani",
-    "greeting": "Buenos días, Candela. Qué bien que hayas venido hoy.",
-    "hint": "Ese jersey te queda genial… ¿y sin él? Me apetece algo entre esas dos.",
-    "finish": "Gracias, guapa. Vuelvo luego.",
+    "greeting": {
+      "es": "Buenos días, Candela. Qué bien que hayas venido hoy.",
+      "en": "Morning, Candela. So glad you came in today."
+    },
+    "hint": {
+      "es": "Ese jersey te queda genial… ¿y sin él? Me apetece algo entre esas dos.",
+      "en": "That sweater looks great on you… and without it? I'm in the mood for something between those two."
+    },
+    "finish": {
+      "es": "Gracias, guapa. Vuelvo luego.",
+      "en": "Thanks, gorgeous. I'll be back later."
+    },
     "look": "short brown hair, stubble, light blue dress shirt, blue tie, rolled sleeves, grey slacks",
-    "act_line": "Apriétalas. Así. No pares de escribir.",
-    "climax": "Me voy a correr… quédate quieta.",
-    "leave": "Vale, ya veo cómo va esto.",
+    "act_line": {
+      "es": "Apriétalas. Así. No pares de escribir.",
+      "en": "Squeeze them. Like that. Don't stop typing."
+    },
+    "climax": {
+      "es": "Me voy a correr… quédate quieta.",
+      "en": "I'm gonna cum… hold still."
+    },
+    "leave": {
+      "es": "Vale, ya veo cómo va esto.",
+      "en": "Fine, I see how it is."
+    },
     "touch_rate": 3.0
   },
   "dani": {
@@ -37,18 +61,39 @@
       "top": true,
       "bottom": true
     },
-    "act": "te la mete en la boca sin que sueltes el teclado",
+    "act": {
+      "es": "te la mete en la boca sin que sueltes el teclado",
+      "en": "slides it in your mouth without you letting go of the keyboard"
+    },
     "arousal_rate": 11.0,
     "arousal_rate_unmet": 2.5,
     "patience": 26.0,
     "on_reject": "leave",
-    "greeting": "Hola Candela, pasaba por aquí…",
-    "hint": "No hace falta que te quites nada. Solo abre la boca.",
-    "finish": "Eres la mejor del departamento.",
+    "greeting": {
+      "es": "Hola Candela, pasaba por aquí…",
+      "en": "Hey Candela, just passing by…"
+    },
+    "hint": {
+      "es": "No hace falta que te quites nada. Solo abre la boca.",
+      "en": "You don't need to take anything off. Just open your mouth."
+    },
+    "finish": {
+      "es": "Eres la mejor del departamento.",
+      "en": "You're the best in the department."
+    },
     "look": "short black hair, undercut, green polo shirt, lanyard with badge, dark jeans, athletic",
-    "act_line": "Mírame mientras tecleas. Eres increíble.",
-    "climax": "Abre bien, me voy a correr.",
-    "leave": "Otro día será, Candela.",
+    "act_line": {
+      "es": "Mírame mientras tecleas. Eres increíble.",
+      "en": "Look at me while you type. You're incredible."
+    },
+    "climax": {
+      "es": "Abre bien, me voy a correr.",
+      "en": "Open wide, I'm gonna cum."
+    },
+    "leave": {
+      "es": "Otro día será, Candela.",
+      "en": "Some other day, Candela."
+    },
     "touch_rate": 2.5
   },
   "sergio": {
@@ -59,20 +104,41 @@
       "top": false,
       "bottom": false
     },
-    "act": "te pone contra la mesa",
+    "act": {
+      "es": "te pone contra la mesa",
+      "en": "bends you over the desk"
+    },
     "arousal_rate": 7.5,
     "arousal_rate_unmet": 2.0,
     "patience": 22.0,
     "on_reject": "aggravate",
     "brings": "mario",
-    "greeting": "Candela, necesito diez minutos de tu tiempo. Todo tu tiempo.",
-    "hint": "Hoy no me vale a medias. Todo fuera.",
-    "finish": "Diez minutos bien invertidos.",
+    "greeting": {
+      "es": "Candela, necesito diez minutos de tu tiempo. Todo tu tiempo.",
+      "en": "Candela, I need ten minutes of your time. All of your time."
+    },
+    "hint": {
+      "es": "Hoy no me vale a medias. Todo fuera.",
+      "en": "No half measures today. Everything off."
+    },
+    "finish": {
+      "es": "Diez minutos bien invertidos.",
+      "en": "Ten minutes well spent."
+    },
     "look": "bald, dark beard, purple dress shirt, black vest, glasses, stocky",
     "sprite_seed": 6071,
-    "act_line": "Sigue con el informe. Yo sigo con lo mío.",
-    "climax": "Aguanta… ya.",
-    "leave": "Esto lo apunto.",
+    "act_line": {
+      "es": "Sigue con el informe. Yo sigo con lo mío.",
+      "en": "Keep working on the report. I'll keep working on you."
+    },
+    "climax": {
+      "es": "Aguanta… ya.",
+      "en": "Hold on… now."
+    },
+    "leave": {
+      "es": "Esto lo apunto.",
+      "en": "I'm making a note of this."
+    },
     "touch_rate": 3.5
   }
 }

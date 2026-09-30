@@ -51,12 +51,60 @@ Clave de estado de la escena: `{work|fuck|hot|climax}_{top|notop}_{bottom|nobott
 (`hot` = distraída y sola; `climax` cae a `fuck` si no hay imagen propia).
 Ej.: `fuck_notop_bottom_mario.png`. Añadir un nivel = un JSON; añadir arte = PNG con esa clave.
 
+## Idiomas (es / en)
+
+Selector ES / EN arriba a la derecha del menú; por defecto, el idioma del navegador/sistema. Se guarda en
+`user://language.json` (`scripts/autoload/l10n.gd`).
+
+- **UI:** el texto se escribe en español dentro de `tr("…")` y `data/i18n/en.json` da el inglés (clave = el texto en
+  español, con los mismos `%s`/`%d`). En código estático, `L10n.t("…")`. Texto nuevo de UI = `tr()` + una línea en `en.json`.
+- **Datos:** en `data/*.json` cualquier texto puede ser `{"es": "…", "en": "…"}`; `Catalog` lo resuelve al idioma activo
+  al cargar (y recarga al cambiar). Un texto plano vale para los dos (nombres, emojis).
+
+## Publicidad (amateur.tv / sugarcams)
+
+`data/ads.json`, por idioma: en español se anuncia y enlaza **amateur.tv** (`es.amateur.tv`) y en inglés **sugarcams**
+(`www.sugarcams.com`, misma red; regla de la skill `infinity:amateur-cams`). Con `url` vacío no sale ningún anuncio.
+Ubicaciones: `menu` (banner abajo a la derecha), `phone` (chat patrocinado con foto que llega al móvil a la hora
+`phone.at`; no drena productividad y al abrirlo pausa la jornada) y `end_win` / `end_lose` (banner del fin de jornada).
+
+`banners` dice qué imagen lleva cada variante en cada sitio y en cada idioma: `a` = foto, `b` = cartoon, `c` = cartoon
+NSFW. Activa: `c` (`"variant": "c"`); con `variant` vacío cada sesión elige una al azar (test A/B) y la métrica guarda
+cuál. Se generan con `tools/ad_banner.py`: `gen` saca los fondos en el pod (Krea 2 Turbo para `a`/`b`, Illustrious +
+LoRA Flash para `c`; en `assets/ads/bg/`, fuera del export) y `compose` pone encima logo, titular y botón en los dos
+idiomas (`*_en.png` en inglés). Logos: `assets/ads/amateur_logo.png` y `assets/ads/sugarcams_logo.png` (si falta, se
+dibuja el nombre). Los titulares están en el script. Sin imagen se cae a la tarjeta de texto del JSON.
+Código en `scripts/ui/ads.gd`.
+
+## Métricas (Landing Metrics)
+
+Skill `infinity:metrics`; contrato completo en `docs/metrics-api-guide.md` y `docs/utm-tracking-propagation-guide.md`.
+En el export web, `scripts/autoload/metrics.gd` inyecta `web/metrics.js` (va en el `.pck` por el `include_filter` del
+preset): captura `utm_*`, `a`, `gclid`, `fbclid`, `conversion` de la URL de entrada y los guarda 30 días en 3 capas
+(cookie, localStorage, sessionStorage), `cost`/`country` aparte, visitor id `overtime_visitor_id`, y envía con `fetch`
+(`keepalive`, `credentials: "omit"`). En builds de depuración no se envía nada: solo consola (`[analytics]`).
+
+| Evento | Cuándo | `metadata` |
+|---|---|---|
+| `view` | al arrancar el juego | `lang`, `platform` (+ `cost`) |
+| `view_time` | al ocultar/cerrar la pestaña | `view_time_seconds` |
+| `click` | Jugar, cambiar idioma | `offer_slug`: `play`, `lang` |
+| `click` (salida) | banner o chat del patrocinador | `offer_slug`: `amateur:` / `sugarcams:` + `banner-menu`, `banner-end-win`, `banner-end-lose`, `phone-chat` |
+| `event` | empezar/acabar jornada, anuncio visto | `offer_slug`: `day_start`, `day_end`, `ad_impression` |
+
+El enlace de salida lleva los parámetros del visitante (mandan siempre) y, solo si faltan, `utm_medium=overtime`
+(`tracking` en `ads.json`), `utm_content` = ubicación y `utm_source` = dominio del juego. El resto de `Metrics.track()`
+(mensajes, ropa, visitas…) solo sale por consola en debug: demasiado frecuente para el panel (`REMOTE_EVENTS`).
+Endpoint: `LOG_URL` en `metrics.gd`, `https://landingmetrics.tech555.app/log` (la guía dice `.dev`; pendiente de confirmar).
+Prueba rápida: abrir el export con `?utm_medium=test&a=PRUEBA123&utm_campaign=x` y mirar el `href` de salida y la pestaña
+de red.
+
 ## Código
 
     scripts/game/day.gd          simulación pura (sin UI): reloj, informe, productividad, visitas, mensajes
     scripts/game/game.gd         pantalla: panel izquierdo + escena + feedback
     scripts/game/scene_view.gd   ilustración por estado o placeholder
-    scripts/autoload/            Metrics (eventos), Catalog (datos), Meta (progreso; persist=false en herramientas)
+    scripts/autoload/            Metrics (Landing Metrics), L10n (idioma), Catalog (datos), Meta (progreso; persist=false en herramientas)
 
 ## Arte: una base + Qwen-Image-Edit (decisión final)
 

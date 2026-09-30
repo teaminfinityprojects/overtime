@@ -2,17 +2,26 @@
   "defaults": {
     "flirt": [
       {
-        "label": "Ven a verme.",
+        "label": {
+          "es": "Ven a verme.",
+          "en": "Come see me."
+        },
         "effects": {
           "visit_delay": -8
         }
       },
       {
-        "label": "Jaja, a trabajar.",
+        "label": {
+          "es": "Jaja, a trabajar.",
+          "en": "Haha, back to work."
+        },
         "effects": {}
       },
       {
-        "label": "Para ya.",
+        "label": {
+          "es": "Para ya.",
+          "en": "Stop it."
+        },
         "effects": {
           "reject": true
         }
@@ -24,35 +33,53 @@
         "effects": {}
       },
       {
-        "label": "Ahora déjame trabajar.",
+        "label": {
+          "es": "Ahora déjame trabajar.",
+          "en": "Now let me work."
+        },
         "effects": {}
       }
     ],
     "angry": [
       {
-        "label": "Lo siento, de verdad.",
+        "label": {
+          "es": "Lo siento, de verdad.",
+          "en": "I'm really sorry."
+        },
         "effects": {}
       },
       {
-        "label": "Pues nada.",
+        "label": {
+          "es": "Pues nada.",
+          "en": "Oh well."
+        },
         "effects": {}
       }
     ],
     "nag": [
       {
-        "label": "En ello, jefe.",
+        "label": {
+          "es": "En ello, jefe.",
+          "en": "On it, boss."
+        },
         "effects": {}
       }
     ],
     "tease": [
       {
-        "label": "Ya veremos…",
+        "label": {
+          "es": "Ya veremos…",
+          "en": "We'll see…"
+        },
         "effects": {
           "visit_delay": -5
         }
       },
       {
-        "label": "Céntrate en lo tuyo.",
+        "label": {
+          "es": "Céntrate en lo tuyo.",
+          "en": "Focus on your own work."
+        },
         "effects": {}
       }
     ]
@@ -61,178 +88,328 @@
     "mario": {
       "flirt": [
         {
-          "text": "¿Sabes qué le falta a este café? Tú, mirándome mientras me lo tomo."
+          "text": {
+            "es": "¿Sabes qué le falta a este café? Tú, mirándome mientras me lo tomo.",
+            "en": "You know what this coffee is missing? You, watching me drink it."
+          }
         },
         {
-          "text": "Acabo de pasar por tu lado y he tenido que volver a sentarme. Culpa tuya."
+          "text": {
+            "es": "Acabo de pasar por tu lado y he tenido que volver a sentarme. Culpa tuya.",
+            "en": "I just walked past you and had to go sit back down. Your fault."
+          }
         },
         {
-          "text": "Tengo diez minutos libres y una sola idea de en qué gastarlos 😏"
+          "text": {
+            "es": "Tengo diez minutos libres y una sola idea de en qué gastarlos 😏",
+            "en": "I've got ten free minutes and just one idea how to spend them 😏"
+          }
         },
         {
-          "text": "¿Ese jersey nuevo es para mí o me lo imagino?"
+          "text": {
+            "es": "¿Ese jersey nuevo es para mí o me lo imagino?",
+            "en": "Is that new sweater for me or am I imagining it?"
+          }
         },
         {
-          "text": "La máquina de café está rota. Necesito otra forma de despertarme."
+          "text": {
+            "es": "La máquina de café está rota. Necesito otra forma de despertarme.",
+            "en": "The coffee machine is broken. I need another way to wake up."
+          }
         },
         {
-          "text": "Te juro que si no vengo a verte ahora no saco nada adelante hoy."
+          "text": {
+            "es": "Te juro que si no vengo a verte ahora no saco nada adelante hoy.",
+            "en": "I swear if I don't come see you now I won't get anything done today."
+          }
         },
         {
-          "text": "Se me ha caído el boli tres veces mirando hacia tu mesa. Tres."
+          "text": {
+            "es": "Se me ha caído el boli tres veces mirando hacia tu mesa. Tres.",
+            "en": "I've dropped my pen three times staring at your desk. Three."
+          }
         },
         {
-          "text": "Café con leche, dos azúcares y… lo que tú quieras."
+          "text": {
+            "es": "Café con leche, dos azúcares y… lo que tú quieras.",
+            "en": "Latte, two sugars and… whatever you want."
+          }
         }
       ],
       "after": [
         {
-          "text": "Todavía tiemblo. Y tengo reunión en cinco minutos, no sé cómo lo voy a hacer."
+          "text": {
+            "es": "Todavía tiemblo. Y tengo reunión en cinco minutos, no sé cómo lo voy a hacer.",
+            "en": "I'm still shaking. And I have a meeting in five minutes, no idea how I'll manage."
+          }
         },
         {
-          "text": "Eso no ha sido un descanso para el café, ha sido religioso."
+          "text": {
+            "es": "Eso no ha sido un descanso para el café, ha sido religioso.",
+            "en": "That wasn't a coffee break, that was religious."
+          }
         },
         {
-          "text": "Gracias, guapa. Te debo un café de verdad, uno bueno."
+          "text": {
+            "es": "Gracias, guapa. Te debo un café de verdad, uno bueno.",
+            "en": "Thanks, gorgeous. I owe you a real coffee, a good one."
+          }
         },
         {
-          "text": "No puedo dejar de sonreír y la gente me mira raro. Merece la pena."
+          "text": {
+            "es": "No puedo dejar de sonreír y la gente me mira raro. Merece la pena.",
+            "en": "I can't stop smiling and people are giving me looks. Worth it."
+          }
         }
       ],
       "angry": [
         {
-          "text": "Vale. Mensaje recibido. Hoy no molesto más."
+          "text": {
+            "es": "Vale. Mensaje recibido. Hoy no molesto más.",
+            "en": "Okay. Message received. I won't bother you again today."
+          }
         },
         {
-          "text": "Me he sentido un poco tonto ahí de pie, ¿sabes?"
+          "text": {
+            "es": "Me he sentido un poco tonto ahí de pie, ¿sabes?",
+            "en": "I felt kind of stupid standing there, you know?"
+          }
         }
       ]
     },
     "dani": {
       "flirt": [
         {
-          "text": "Acabo de salir del gym. Necesito bajar el pulso… o subirlo del todo."
+          "text": {
+            "es": "Acabo de salir del gym. Necesito bajar el pulso… o subirlo del todo.",
+            "en": "Just got out of the gym. I need to bring my pulse down… or all the way up."
+          }
         },
         {
-          "text": "Desde mi sitio te veo teclear. Esa boca concentrada me está matando."
+          "text": {
+            "es": "Desde mi sitio te veo teclear. Esa boca concentrada me está matando.",
+            "en": "I can see you typing from my seat. That focused mouth is killing me."
+          }
         },
         {
-          "text": "No pido mucho: ni ropa fuera, ni excusas. Solo dos minutos de tu atención."
+          "text": {
+            "es": "No pido mucho: ni ropa fuera, ni excusas. Solo dos minutos de tu atención.",
+            "en": "I'm not asking for much: no clothes off, no excuses. Just two minutes of your attention."
+          }
         },
         {
-          "text": "Te he traído una botella de agua. Es una excusa, obviamente."
+          "text": {
+            "es": "Te he traído una botella de agua. Es una excusa, obviamente.",
+            "en": "I brought you a bottle of water. It's an excuse, obviously."
+          }
         },
         {
-          "text": "Cinco minutos. Ni siquiera tienes que dejar el teclado."
+          "text": {
+            "es": "Cinco minutos. Ni siquiera tienes que dejar el teclado.",
+            "en": "Five minutes. You don't even have to leave the keyboard."
+          }
         },
         {
-          "text": "¿Sabes que se te caen las gafas cuando te concentras? Es lo mejor de esta oficina."
+          "text": {
+            "es": "¿Sabes que se te caen las gafas cuando te concentras? Es lo mejor de esta oficina.",
+            "en": "You know your glasses slip when you concentrate? Best thing in this office."
+          }
         },
         {
-          "text": "Hoy llevo el polo verde. Sé que te gusta. Lo he hecho a propósito."
+          "text": {
+            "es": "Hoy llevo el polo verde. Sé que te gusta. Lo he hecho a propósito.",
+            "en": "I'm wearing the green polo today. I know you like it. I did it on purpose."
+          }
         },
         {
-          "text": "Me he apuntado a la reunión de tu departamento solo para pasar por tu mesa."
+          "text": {
+            "es": "Me he apuntado a la reunión de tu departamento solo para pasar por tu mesa.",
+            "en": "I signed up for your department's meeting just to walk past your desk."
+          }
         }
       ],
       "after": [
         {
-          "text": "Eres la mejor del departamento. Y no lo digo por el informe."
+          "text": {
+            "es": "Eres la mejor del departamento. Y no lo digo por el informe.",
+            "en": "You're the best in the department. And I don't mean the report."
+          }
         },
         {
-          "text": "Ahora sí puedo concentrarme. Vale, no, pero al menos estoy de buen humor."
+          "text": {
+            "es": "Ahora sí puedo concentrarme. Vale, no, pero al menos estoy de buen humor.",
+            "en": "Now I can focus. Okay, no, but at least I'm in a good mood."
+          }
         },
         {
-          "text": "He vuelto a mi mesa con las piernas de gelatina. Gracias por eso."
+          "text": {
+            "es": "He vuelto a mi mesa con las piernas de gelatina. Gracias por eso.",
+            "en": "I got back to my desk with jelly legs. Thanks for that."
+          }
         },
         {
-          "text": "Luego te invito a algo. Fuera de la oficina, si te apetece."
+          "text": {
+            "es": "Luego te invito a algo. Fuera de la oficina, si te apetece.",
+            "en": "Let me buy you a drink later. Outside the office, if you're up for it."
+          }
         }
       ],
       "angry": [
         {
-          "text": "Entendido. Otro día será."
+          "text": {
+            "es": "Entendido. Otro día será.",
+            "en": "Got it. Some other day."
+          }
         },
         {
-          "text": "No pasa nada, ya sé que hoy vas a tope. Suerte con el informe."
+          "text": {
+            "es": "No pasa nada, ya sé que hoy vas a tope. Suerte con el informe.",
+            "en": "It's fine, I know you're slammed today. Good luck with the report."
+          }
         }
       ]
     },
     "sergio": {
       "flirt": [
         {
-          "text": "Tengo un hueco en la agenda a las y media. Lo he bloqueado con tu nombre."
+          "text": {
+            "es": "Tengo un hueco en la agenda a las y media. Lo he bloqueado con tu nombre.",
+            "en": "I've got a gap in my calendar at half past. I blocked it with your name."
+          }
         },
         {
-          "text": "He revisado tu productividad de esta mañana. Creo que necesitas una pausa activa."
+          "text": {
+            "es": "He revisado tu productividad de esta mañana. Creo que necesitas una pausa activa.",
+            "en": "I reviewed your productivity this morning. I think you need an active break."
+          }
         },
         {
-          "text": "No me gustan las medias tintas. Cuando vaya, quiero todo fuera. Aviso."
+          "text": {
+            "es": "No me gustan las medias tintas. Cuando vaya, quiero todo fuera. Aviso.",
+            "en": "I don't do half measures. When I come over, I want everything off. Fair warning."
+          }
         },
         {
-          "text": "Diez minutos de tu tiempo. Diez. Bien invertidos, ya lo sabes."
+          "text": {
+            "es": "Diez minutos de tu tiempo. Diez. Bien invertidos, ya lo sabes.",
+            "en": "Ten minutes of your time. Ten. Well spent, you know it."
+          }
         },
         {
-          "text": "Estás sentada de una manera que no es profesional. Voy a tener que comprobarlo."
+          "text": {
+            "es": "Estás sentada de una manera que no es profesional. Voy a tener que comprobarlo.",
+            "en": "The way you're sitting isn't professional. I'll have to check on it."
+          }
         },
         {
-          "text": "He cerrado la puerta de la sala de reuniones. Pero prefiero tu mesa."
+          "text": {
+            "es": "He cerrado la puerta de la sala de reuniones. Pero prefiero tu mesa.",
+            "en": "I've closed the meeting room door. But I prefer your desk."
+          }
         },
         {
-          "text": "Cuando me subo las gafas es que estoy pensando en algo. Adivina en qué."
+          "text": {
+            "es": "Cuando me subo las gafas es que estoy pensando en algo. Adivina en qué.",
+            "en": "When I push my glasses up it means I'm thinking about something. Guess what."
+          }
         },
         {
-          "text": "Hoy no quiero conversación. Quiero lo que sabes."
+          "text": {
+            "es": "Hoy no quiero conversación. Quiero lo que sabes.",
+            "en": "I don't want small talk today. I want you know what."
+          }
         }
       ],
       "after": [
         {
-          "text": "Diez minutos bien invertidos. Como siempre."
+          "text": {
+            "es": "Diez minutos bien invertidos. Como siempre.",
+            "en": "Ten minutes well spent. As always."
+          }
         },
         {
-          "text": "Me he tenido que sentar un rato antes de volver a la reunión. Anotado."
+          "text": {
+            "es": "Me he tenido que sentar un rato antes de volver a la reunión. Anotado.",
+            "en": "I had to sit down for a bit before going back to the meeting. Noted."
+          }
         },
         {
-          "text": "Eficiente. Precisa. Deberías estar en mi equipo."
+          "text": {
+            "es": "Eficiente. Precisa. Deberías estar en mi equipo.",
+            "en": "Efficient. Precise. You should be on my team."
+          }
         },
         {
-          "text": "Ahora sí, termina ese informe. Que no diga el jefe que te distraigo."
+          "text": {
+            "es": "Ahora sí, termina ese informe. Que no diga el jefe que te distraigo.",
+            "en": "Now finish that report. Don't let the boss say I'm distracting you."
+          }
         }
       ],
       "angry": [
         {
-          "text": "Esto lo apunto, Candela."
+          "text": {
+            "es": "Esto lo apunto, Candela.",
+            "en": "I'm making a note of this, Candela."
+          }
         },
         {
-          "text": "No me gusta esperar. Y menos para nada."
+          "text": {
+            "es": "No me gusta esperar. Y menos para nada.",
+            "en": "I don't like waiting. Especially for nothing."
+          }
         }
       ]
     },
     "boss": {
       "nag": [
         {
-          "text": "¿Ese informe se está escribiendo solo? Porque desde aquí no te veo tecleando mucho."
+          "text": {
+            "es": "¿Ese informe se está escribiendo solo? Porque desde aquí no te veo tecleando mucho.",
+            "en": "Is that report writing itself? Because from here I don't see you typing much."
+          }
         },
         {
-          "text": "Recuerda: 17:00. No 17:05. No 'casi'. 17:00."
+          "text": {
+            "es": "Recuerda: 17:00. No 17:05. No 'casi'. 17:00.",
+            "en": "Remember: 5:00 pm. Not 5:05. Not 'almost'. 5:00."
+          }
         },
         {
-          "text": "Dirección me pregunta por los números. Dime que voy a poder decirles algo."
+          "text": {
+            "es": "Dirección me pregunta por los números. Dime que voy a poder decirles algo.",
+            "en": "Management is asking about the numbers. Tell me I'll have something to tell them."
+          }
         },
         {
-          "text": "Veo mucho movimiento alrededor de tu mesa. Espero que sea trabajo."
+          "text": {
+            "es": "Veo mucho movimiento alrededor de tu mesa. Espero que sea trabajo.",
+            "en": "I see a lot of traffic around your desk. I hope it's work."
+          }
         },
         {
-          "text": "Cuando termines el informe, quiero un resumen ejecutivo. Antes de las cinco también."
+          "text": {
+            "es": "Cuando termines el informe, quiero un resumen ejecutivo. Antes de las cinco también.",
+            "en": "When you finish the report, I want an executive summary. Also before five."
+          }
         },
         {
-          "text": "Candela, te noto dispersa. Concéntrate."
+          "text": {
+            "es": "Candela, te noto dispersa. Concéntrate.",
+            "en": "Candela, you seem distracted. Focus."
+          }
         },
         {
-          "text": "Si necesitas ayuda, pídela. Si no la necesitas, entrega."
+          "text": {
+            "es": "Si necesitas ayuda, pídela. Si no la necesitas, entrega.",
+            "en": "If you need help, ask. If you don't, deliver."
+          }
         },
         {
-          "text": "Este trimestre nos va a definir. Ese informe también."
+          "text": {
+            "es": "Este trimestre nos va a definir. Ese informe también.",
+            "en": "This quarter will define us. So will that report."
+          }
         }
       ]
     }

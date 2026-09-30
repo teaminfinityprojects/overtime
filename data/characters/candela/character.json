@@ -1,6 +1,9 @@
 {
   "slug": "candela",
   "name": "Candela",
-  "tagline": "Administrativa. Eficiente, sonriente y con la puerta siempre abierta.",
+  "tagline": {
+    "es": "Administrativa. Eficiente, sonriente y con la puerta siempre abierta.",
+    "en": "Office admin. Efficient, smiling and her door is always open."
+  },
   "accent": "#e8557a"
 }

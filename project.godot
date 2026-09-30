@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Metrics="*res://scripts/autoload/metrics.gd"
+L10n="*res://scripts/autoload/l10n.gd"
 Catalog="*res://scripts/autoload/catalog.gd"
 Meta="*res://scripts/autoload/meta.gd"
 Screen="*res://scripts/autoload/screen.gd"
