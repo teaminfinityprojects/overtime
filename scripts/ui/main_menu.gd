@@ -92,7 +92,7 @@ func _ready() -> void:
 		ad.offset_top = -24 - ad_size.y
 		add_child(ad)
 	_language_switch()
-	var version := UIKit.label("v%s · +18 · TeamSquad" % ProjectSettings.get_setting("application/config/version", "0.1"), 12, UIKit.TEXT_DIM)
+	var version := UIKit.label("v%s · +18" %ProjectSettings.get_setting("application/config/version", "0.1"), 12, UIKit.TEXT_DIM)
 	column.add_child(version)
 
 
