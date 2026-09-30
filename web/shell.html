@@ -300,7 +300,63 @@ body {
 	}
 }
 
+/* Girar el móvil: el juego es horizontal. Solo con el juego cargado, en táctil y en vertical. */
+#rotate {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 2;
+	background: var(--bg);
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 18px;
+	padding: 24px;
+	text-align: center;
+}
+
+@media (orientation: portrait) and (hover: none) and (pointer: coarse) {
+	body.game-ready #rotate {
+		display: flex;
+	}
+}
+
+#rotate h2 {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+}
+
+#rotate p {
+	margin: 0;
+	max-width: 300px;
+	color: var(--text-dim);
+	font-size: 16px;
+	line-height: 1.4;
+}
+
+#rotate .button {
+	max-width: 300px;
+}
+
+.rotate-phone {
+	width: 96px;
+	height: 96px;
+	animation: turn 2.4s ease-in-out infinite;
+}
+
+@keyframes turn {
+	0%, 20% { transform: rotate(0deg); }
+	50%, 80% { transform: rotate(-90deg); }
+	100% { transform: rotate(0deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+	.rotate-phone {
+		animation: none;
+		transform: rotate(-90deg);
+	}
+
 	.bar.indeterminate .bar-fill {
 		animation: none;
 		width: 100%;
@@ -349,6 +405,16 @@ body {
 			</a>
 		</div>
 
+		<div id="rotate" role="dialog" aria-labelledby="rotate-title">
+			<svg class="rotate-phone" viewBox="0 0 24 24" fill="none" stroke="#e8557a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<rect x="6" y="2" width="12" height="20" rx="2.5"></rect>
+				<path d="M11 18h2"></path>
+			</svg>
+			<h2 id="rotate-title" data-t="rotate_title"></h2>
+			<p data-t="rotate_text"></p>
+			<button class="button" id="rotate-fullscreen" type="button" data-t="rotate_fullscreen" hidden></button>
+		</div>
+
 		<script src="metrics.js"></script>
 		<script src="$GODOT_URL"></script>
 		<script>
@@ -369,6 +435,9 @@ const engine = new Engine(GODOT_CONFIG);
 			loading: 'Cargando la oficina…',
 			tip: 'Lo que lleva puesto Candela decide lo que pasa en su mesa.',
 			ad: 'Publicidad',
+			rotate_title: 'Gira el móvil',
+			rotate_text: 'Overtime se juega en horizontal. Pon el móvil de lado para seguir.',
+			rotate_fullscreen: 'Pantalla completa en horizontal',
 			error: 'No se ha podido cargar el juego.',
 			missing: 'A tu navegador le faltan funciones que el juego necesita:',
 		},
@@ -382,6 +451,9 @@ const engine = new Engine(GODOT_CONFIG);
 			loading: 'Loading the office…',
 			tip: 'What Candela is wearing decides what happens at her desk.',
 			ad: 'Ad',
+			rotate_title: 'Rotate your phone',
+			rotate_text: 'Overtime is played in landscape. Turn your phone sideways to keep playing.',
+			rotate_fullscreen: 'Landscape fullscreen',
 			error: "The game couldn't be loaded.",
 			missing: 'Your browser is missing features the game needs:',
 		},
@@ -509,6 +581,8 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
+			document.body.classList.add('game-ready');
+			watchRotation();
 			statusOverlay.classList.add('leaving');
 			setTimeout(() => statusOverlay.remove(), 400);
 		}, displayFailureNotice);
@@ -522,6 +596,32 @@ const engine = new Engine(GODOT_CONFIG);
 	});
 	$('gate-exit').addEventListener('click', () => {
 		window.location.href = 'https://www.google.com/';
+	});
+
+	// --- Girar el móvil ---------------------------------------------------------------------
+	// El aviso lo pinta el CSS; aquí solo se mide (una vez por carga) y se ofrece, donde se puede
+	// (Android), pantalla completa bloqueada en horizontal. iPhone Safari no deja: solo se pide girar.
+	const portraitTouch = window.matchMedia('(orientation: portrait) and (hover: none) and (pointer: coarse)');
+	const canLock = Boolean(document.documentElement.requestFullscreen && screen.orientation && screen.orientation.lock);
+	let rotateTracked = false;
+
+	function onRotation() {
+		if (!portraitTouch.matches || rotateTracked || !metrics) return;
+		rotateTracked = true;
+		metrics.send('event', JSON.stringify({ offer_slug: 'rotate_prompt', lang }));
+	}
+
+	function watchRotation() {
+		$('rotate-fullscreen').hidden = !canLock;
+		onRotation();
+		portraitTouch.addEventListener('change', onRotation);
+	}
+
+	$('rotate-fullscreen').dataset.offer = 'rotate-fullscreen';
+	$('rotate-fullscreen').addEventListener('click', () => {
+		document.documentElement.requestFullscreen({ navigationUI: 'hide' })
+			.then(() => screen.orientation.lock('landscape'))
+			.catch(() => { /* sin permiso: queda el aviso para girarlo a mano */ });
 	});
 
 	if (accepted) {

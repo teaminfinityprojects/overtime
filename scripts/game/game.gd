@@ -91,6 +91,8 @@ func _ready() -> void:
 	_phone.sponsor_opened.connect(_open_pause)
 	day.start(Catalog.level(level_id))
 	_scene.day = day
+	# En móvil, girar a vertical tapa el juego con el aviso de la página (web/shell.html): se pausa la jornada.
+	get_viewport().size_changed.connect(_pause_if_portrait)
 	# Fundido de entrada.
 	_flash.color = Color(UIKit.BG, 1.0)
 	create_tween().tween_property(_flash, "color:a", 0.0, 0.6)
@@ -541,7 +543,13 @@ func _close_overlay() -> void:
 	get_tree().paused = false
 
 
-## Pausa: solo congela. tr("Seguir") retoma exactamente donde estaba.
+func _pause_if_portrait() -> void:
+	var view := get_viewport().get_visible_rect().size
+	if DisplayServer.is_touchscreen_available() and view.x < view.y:
+		_open_pause()
+
+
+## Pausa: solo congela. "Seguir" retoma exactamente donde estaba.
 func _open_pause() -> void:
 	if _overlay_node or day.finished:
 		return

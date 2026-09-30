@@ -88,9 +88,9 @@ objeto (si faltara, `scripts/autoload/metrics.gd` lo inyecta desde el `.pck`, do
 | --- | --- | --- |
 | `view` | al abrir la página (pantalla de carga; una vez por carga) | `lang`, `age_gate` (`shown`/`skipped`) (+ `cost`) |
 | `view_time` | al ocultar/cerrar la pestaña | `view_time_seconds` |
-| `click` | aviso +18, Jugar, cambiar idioma | `offer_slug`: `age-accept`, `age-exit`, `play`, `lang` |
+| `click` | aviso +18, girar a pantalla completa, Jugar, cambiar idioma | `offer_slug`: `age-accept`, `age-exit`, `rotate-fullscreen`, `play`, `lang` |
 | `click` (salida) | banner o chat del patrocinador | `offer_slug`: `amateur:` / `sugarcams:` + `banner-loader`, `banner-menu`, `banner-end-win`, `banner-end-lose`, `phone-chat` |
-| `event` | empezar/acabar jornada, anuncio visto | `offer_slug`: `day_start`, `day_end`, `ad_impression` (`placement`: `loader`, `menu`…) |
+| `event` | empezar/acabar jornada, anuncio visto, aviso de girar | `offer_slug`: `day_start`, `day_end`, `ad_impression` (`placement`: `loader`, `menu`…), `rotate_prompt` |
 
 El enlace de salida lleva los parámetros del visitante (mandan siempre) y, solo si faltan, `utm_medium=overtime`
 (`tracking` en `ads.json`), `utm_content` = ubicación y `utm_source` = dominio del juego. El resto de `Metrics.track()`
@@ -107,6 +107,10 @@ de red.
    (`overtime_age_ok`); el motor empieza a descargarse al aceptar, así que no se ve ni suena nada antes. "Salir" lleva a Google.
 2. **Carga**: splash de Candela (`application/boot_splash/image`, que es también el splash del motor), logo, barra de
    progreso y el banner del patrocinador abajo a la derecha (lee `data/ads.json`: variante, idioma, enlace y tracking).
+
+3. **Girar el móvil**: con el juego ya cargado, en pantallas táctiles en vertical se tapa el juego con "Gira el móvil"
+   (el juego es horizontal). En Android hay botón de pantalla completa que bloquea la orientación en horizontal; en
+   iPhone Safari no se puede, solo se pide girar. Si se gira a vertical en plena jornada, el juego se pausa (`game.gd`).
 
 Todo autoalojado (nginx manda COEP `require-corp`): tras exportar, `deploy/web_extras.sh` copia junto al export
 `metrics.js`, `loader/` (logo, Nunito, `ads.json`) y `ads/` (banners). El Dockerfile ya lo ejecuta.
