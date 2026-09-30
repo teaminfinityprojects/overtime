@@ -79,18 +79,18 @@ Código en `scripts/ui/ads.gd`.
 ## Métricas (Landing Metrics)
 
 Skill `infinity:metrics`; contrato completo en `docs/metrics-api-guide.md` y `docs/utm-tracking-propagation-guide.md`.
-En el export web, `scripts/autoload/metrics.gd` inyecta `web/metrics.js` (va en el `.pck` por el `include_filter` del
-preset): captura `utm_*`, `a`, `gclid`, `fbclid`, `conversion` de la URL de entrada y los guarda 30 días en 3 capas
+En el export web, `web/metrics.js` lo carga la pantalla de carga antes que el motor y el juego reutiliza el mismo
+objeto (si faltara, `scripts/autoload/metrics.gd` lo inyecta desde el `.pck`, donde va por el `include_filter`): captura `utm_*`, `a`, `gclid`, `fbclid`, `conversion` de la URL de entrada y los guarda 30 días en 3 capas
 (cookie, localStorage, sessionStorage), `cost`/`country` aparte, visitor id `overtime_visitor_id`, y envía con `fetch`
-(`keepalive`, `credentials: "omit"`). En builds de depuración no se envía nada: solo consola (`[analytics]`).
+(`keepalive`, `credentials: "omit"`). En builds de depuración y en `localhost` no se envía nada: solo consola (`[analytics]`).
 
 | Evento | Cuándo | `metadata` |
-|---|---|---|
-| `view` | al arrancar el juego | `lang`, `platform` (+ `cost`) |
+| --- | --- | --- |
+| `view` | al abrir la página (pantalla de carga; una vez por carga) | `lang`, `age_gate` (`shown`/`skipped`) (+ `cost`) |
 | `view_time` | al ocultar/cerrar la pestaña | `view_time_seconds` |
-| `click` | Jugar, cambiar idioma | `offer_slug`: `play`, `lang` |
-| `click` (salida) | banner o chat del patrocinador | `offer_slug`: `amateur:` / `sugarcams:` + `banner-menu`, `banner-end-win`, `banner-end-lose`, `phone-chat` |
-| `event` | empezar/acabar jornada, anuncio visto | `offer_slug`: `day_start`, `day_end`, `ad_impression` |
+| `click` | aviso +18, Jugar, cambiar idioma | `offer_slug`: `age-accept`, `age-exit`, `play`, `lang` |
+| `click` (salida) | banner o chat del patrocinador | `offer_slug`: `amateur:` / `sugarcams:` + `banner-loader`, `banner-menu`, `banner-end-win`, `banner-end-lose`, `phone-chat` |
+| `event` | empezar/acabar jornada, anuncio visto | `offer_slug`: `day_start`, `day_end`, `ad_impression` (`placement`: `loader`, `menu`…) |
 
 El enlace de salida lleva los parámetros del visitante (mandan siempre) y, solo si faltan, `utm_medium=overtime`
 (`tracking` en `ads.json`), `utm_content` = ubicación y `utm_source` = dominio del juego. El resto de `Metrics.track()`
@@ -98,6 +98,18 @@ El enlace de salida lleva los parámetros del visitante (mandan siempre) y, solo
 Endpoint: `LOG_URL` en `metrics.gd`, `https://landingmetrics.tech555.app/log` (la guía dice `.dev`; pendiente de confirmar).
 Prueba rápida: abrir el export con `?utm_medium=test&a=PRUEBA123&utm_campaign=x` y mirar el `href` de salida y la pestaña
 de red.
+
+## Pantalla de carga (web)
+
+`web/shell.html` (preset Web › `html/custom_html_shell`), sobre la plantilla oficial de Godot 4.7:
+
+1. **Aviso +18** (es/en según el idioma elegido en el juego o el del navegador). Se recuerda en el navegador
+   (`overtime_age_ok`); el motor empieza a descargarse al aceptar, así que no se ve ni suena nada antes. "Salir" lleva a Google.
+2. **Carga**: splash de Candela (`application/boot_splash/image`, que es también el splash del motor), logo, barra de
+   progreso y el banner del patrocinador abajo a la derecha (lee `data/ads.json`: variante, idioma, enlace y tracking).
+
+Todo autoalojado (nginx manda COEP `require-corp`): tras exportar, `deploy/web_extras.sh` copia junto al export
+`metrics.js`, `loader/` (logo, Nunito, `ads.json`) y `ads/` (banners). El Dockerfile ya lo ejecuta.
 
 ## Código
 
@@ -230,6 +242,7 @@ monetización obliga a salir de H3:
 hosting, sin PWA). Plantillas de exportación 4.7.2 en `~/Library/Application Support/Godot/export_templates/`.
 
     godot --headless --path . --export-release Web build/web/index.html
+    sh deploy/web_extras.sh build/web     # pantalla de carga: metrics.js, loader/ y ads/
     python3 tools/serve_web.py            # http://localhost:8060 (añade COOP/COEP por si se activan los hilos)
 
 Vídeo Theora y OGG funcionan en web; el navegador exige un clic antes de reproducir audio (Godot lo gestiona: el

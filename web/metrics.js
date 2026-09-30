@@ -1,5 +1,6 @@
 // Landing Metrics + UTMs para el export web (skill infinity:metrics, portado de tracking.ts y analytics.ts).
-// Lo inyecta scripts/autoload/metrics.gd con JavaScriptBridge al arrancar; expone window.overtimeMetrics.
+// Lo carga la pantalla de carga (web/shell.html) antes que el motor; si falta, lo inyecta
+// scripts/autoload/metrics.gd con JavaScriptBridge. Expone window.overtimeMetrics.
 // Todos los envíos son fire-and-forget: nunca bloquean ni rompen el juego.
 (function () {
 	if (window.overtimeMetrics) return;
@@ -17,7 +18,10 @@
 	const DESTINATION_PREFIX_RE = /^(amateur|sugarcams):/i;
 
 	let logUrl = 'https://landingmetrics.tech555.app/log';
-	let dev = false;
+	// En local no se envía nada (solo consola), igual que en builds de depuración.
+	let dev = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+	let started = false;
+	let viewSent = false;
 
 	// --- Tracking params (3 capas: sessionStorage → localStorage → cookie) ---------------
 
@@ -234,13 +238,32 @@
 	}
 
 	window.overtimeMetrics = {
-		/** config: {log_url, dev}. Sincroniza UTMs y arranca view_time; la vista la manda el juego. */
+		/**
+		 * config: {log_url, dev}. La primera llamada (pantalla de carga) sincroniza UTMs y arranca view_time;
+		 * las siguientes (el juego) solo ajustan la configuración.
+		 */
 		init(configJson) {
 			const config = JSON.parse(configJson || '{}');
 			if (config.log_url) logUrl = config.log_url;
-			dev = Boolean(config.dev);
+			if (config.dev) dev = true;
+			if (started) return;
+			started = true;
 			syncTrackingParams();
 			trackViewTime();
+		},
+		/** La vista va una sola vez por carga de página (la manda quien llegue primero). */
+		view(metadataJson) {
+			if (viewSent) return;
+			viewSent = true;
+			this.send('view', metadataJson);
+		},
+		/** Click interno: offer_slug obligatorio. */
+		click(offerSlug, metadataJson) {
+			try {
+				sendEvent('click', { offer_slug: offerSlug, ...JSON.parse(metadataJson || '{}') });
+			} catch {
+				/* idem */
+			}
 		},
 		send(type, metadataJson) {
 			try {

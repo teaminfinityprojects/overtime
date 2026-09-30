@@ -4,7 +4,8 @@ extends Node
 ##   `event` con offer_slug = evento (el resto, mensajes o ropa, es demasiado frecuente para el panel).
 ## - click(slug, props): click interno. outbound(destino, slug, props): click de salida, offer_slug "destino:slug".
 ## - La vista (`view`) sale al arrancar; `view_time`, al cerrar u ocultar la pestaña.
-## En web todo pasa por web/metrics.js (UTMs en 3 capas, visitor id, view_time), inyectado al arrancar.
+## En web todo pasa por web/metrics.js (UTMs en 3 capas, visitor id, view_time), que carga la pantalla de carga
+## (web/shell.html); si no está, se inyecta aquí.
 ## Fuera de web se envía con HTTPRequest. En builds de depuración no se envía nada: solo consola.
 
 ## Endpoint de Landing Metrics. Los proyectos usan .app y la guía (docs/) dice .dev: confirmar con el equipo.
@@ -19,7 +20,8 @@ var _visitor := ""
 
 func _ready() -> void:
 	if OS.has_feature("web"):
-		var file := FileAccess.open(JS_PATH, FileAccess.READ)
+		_js = JavaScriptBridge.get_interface("overtimeMetrics")
+		var file := FileAccess.open(JS_PATH, FileAccess.READ) if not _js else null
 		if file:
 			JavaScriptBridge.eval(file.get_as_text(), true)
 			_js = JavaScriptBridge.get_interface("overtimeMetrics")
@@ -31,8 +33,13 @@ func _ready() -> void:
 	_send_view.call_deferred()
 
 
+## En web la vista ya la suele mandar la pantalla de carga (web/shell.html); metrics.js la envía una sola vez.
 func _send_view() -> void:
-	_send("view", {"lang": L10n.lang, "platform": OS.get_name()})
+	var meta := {"lang": L10n.lang, "platform": OS.get_name()}
+	if _js:
+		_js.view(JSON.stringify(meta))
+	else:
+		_send("view", meta)
 
 
 func _notification(what: int) -> void:

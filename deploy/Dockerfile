@@ -21,7 +21,8 @@ RUN set -e; \
     mkdir -p build/web; \
     godot --headless --path . --import >/dev/null 2>&1 || true; \
     godot --headless --path . --export-release Web build/web/index.html; \
-    test -s build/web/index.pck && test -s build/web/index.wasm; \
+    sh deploy/web_extras.sh build/web; \
+    test -s build/web/index.pck && test -s build/web/index.wasm && test -s build/web/metrics.js; \
     ls -la build/web
 
 FROM nginx:1.27-alpine

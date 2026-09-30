@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<meta name="rating" content="adult">
+		<meta name="rating" content="RTA-5042-1996-1400-1577-RTA">
+		<title>$GODOT_PROJECT_NAME</title>
+		<!--
+			Pantalla de carga propia de Overtime (preset Web › html/custom_html_shell).
+			1. Aviso +18 (se salta si ya se aceptó en este navegador). La carga del motor empieza al aceptar,
+			   para que no suene ni se vea nada del juego antes.
+			2. Carga: splash de Candela, logo, barra de progreso y el banner del patrocinador (data/ads.json).
+			Todo autoalojado (el sitio va con COEP require-corp): deploy/web_extras.sh copia junto al export
+			metrics.js, loader/ (logo, Nunito, ads.json) y ads/ (banners).
+			Métricas: web/metrics.js manda aquí la vista (view) y los clicks; el juego reutiliza el mismo objeto.
+		-->
+		<style>
+@font-face {
+	font-family: 'Nunito';
+	src: url('loader/Nunito.ttf') format('truetype');
+	font-weight: 200 1000;
+	font-display: swap;
+}
+
+:root {
+	--bg: #23262f;
+	--panel: #2d3140;
+	--panel-light: #3a3f52;
+	--text: #f3f1ea;
+	--text-dim: #a7abb8;
+	--primary: #e8557a;
+	--live: #ef2b4a;
+	--bad: #ef4444;
+	--radius: 14px;
+}
+
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	color: var(--text);
+	background-color: var(--bg);
+	overflow: hidden;
+	touch-action: none;
+	font-family: 'Nunito', system-ui, sans-serif;
+}
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status {
+	position: fixed;
+	inset: 0;
+	background-color: var(--bg);
+	z-index: 1;
+	transition: opacity 0.4s ease;
+}
+
+#status.leaving {
+	opacity: 0;
+}
+
+/* Splash a pantalla completa (la chica a la derecha) y degradado a la izquierda para que el texto se lea. */
+#status-splash {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: right center;
+}
+
+#status::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(35, 38, 47, 0.94) 0%, rgba(35, 38, 47, 0.85) 32%, rgba(35, 38, 47, 0) 58%);
+}
+
+.column {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	bottom: 0;
+	left: 56px;
+	width: 400px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 16px;
+}
+
+.logo {
+	width: 100%;
+	height: auto;
+}
+
+.subtitle {
+	margin: 0;
+	font-size: 20px;
+	color: var(--text-dim);
+}
+
+.card {
+	background: rgba(45, 49, 64, 0.94);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 20px;
+	padding: 22px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.badge {
+	display: inline-block;
+	background: var(--live);
+	color: #fff;
+	font-weight: 900;
+	font-size: 14px;
+	border-radius: 999px;
+	padding: 3px 12px;
+}
+
+.card h2 {
+	margin: 12px 0 6px;
+	font-size: 26px;
+	font-weight: 800;
+}
+
+.card p {
+	margin: 0 0 16px;
+	color: var(--text-dim);
+	font-size: 15px;
+	line-height: 1.4;
+}
+
+.card .fine {
+	margin: 12px 0 0;
+	font-size: 12px;
+}
+
+.button {
+	display: block;
+	width: 100%;
+	min-height: 52px;
+	margin-top: 10px;
+	border: 0;
+	border-radius: 10px;
+	background: var(--primary);
+	color: var(--text);
+	font: 700 18px 'Nunito', system-ui, sans-serif;
+	cursor: pointer;
+}
+
+.button:hover {
+	filter: brightness(1.12);
+}
+
+.button:active {
+	filter: brightness(0.85);
+}
+
+.button:focus-visible {
+	outline: 3px solid var(--text);
+	outline-offset: 2px;
+}
+
+.button.secondary {
+	background: var(--panel-light);
+	font-size: 15px;
+	min-height: 44px;
+}
+
+.loading-label {
+	display: flex;
+	justify-content: space-between;
+	font-size: 15px;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
+.loading-label span:last-child {
+	color: var(--primary);
+}
+
+.bar {
+	height: 10px;
+	border-radius: 5px;
+	background: rgba(255, 255, 255, 0.1);
+	overflow: hidden;
+}
+
+.bar-fill {
+	height: 100%;
+	width: 0%;
+	border-radius: 5px;
+	background: var(--primary);
+	transition: width 0.2s ease;
+}
+
+/* Sin tamaño conocido: franja que se desliza. */
+.bar.indeterminate .bar-fill {
+	width: 35%;
+	animation: slide 1.2s ease-in-out infinite;
+}
+
+@keyframes slide {
+	from { transform: translateX(-100%); }
+	to { transform: translateX(300%); }
+}
+
+.tip {
+	margin: 12px 0 0;
+	font-size: 13px;
+	color: var(--text-dim);
+}
+
+#status-notice {
+	background: rgba(91, 57, 67, 0.95);
+	border: 1px solid #9b3943;
+	border-radius: var(--radius);
+	padding: 16px;
+	line-height: 1.4;
+	font-size: 14px;
+}
+
+/* Patrocinador: esquina inferior derecha, como en el menú del juego. */
+.ad {
+	position: absolute;
+	z-index: 1;
+	right: 24px;
+	bottom: 24px;
+	width: 360px;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+	line-height: 0;
+}
+
+.ad img {
+	width: 100%;
+	height: auto;
+}
+
+.ad:hover {
+	filter: brightness(1.1);
+}
+
+.ad-tag {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	background: rgba(0, 0, 0, 0.55);
+	color: rgba(255, 255, 255, 0.75);
+	font-size: 10px;
+	line-height: 1.6;
+	border-radius: 6px;
+	padding: 0 6px;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+@media (max-width: 720px) {
+	#status::after {
+		background: linear-gradient(180deg, rgba(35, 38, 47, 0.55) 0%, rgba(35, 38, 47, 0.95) 55%);
+	}
+
+	.column {
+		left: 16px;
+		right: 16px;
+		width: auto;
+		justify-content: flex-end;
+		padding-bottom: 130px;
+	}
+
+	.logo {
+		max-width: 280px;
+	}
+
+	.subtitle {
+		font-size: 16px;
+	}
+
+	.ad {
+		left: 16px;
+		right: 16px;
+		bottom: 16px;
+		width: auto;
+		max-width: 400px;
+		margin: 0 auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bar.indeterminate .bar-fill {
+		animation: none;
+		width: 100%;
+		opacity: 0.5;
+	}
+}
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" src="$GODOT_SPLASH" alt="">
+			<div class="column">
+				<img class="logo" src="loader/logo.png" alt="Overtime">
+				<p class="subtitle" data-t="subtitle"></p>
+
+				<div class="card" id="gate" hidden>
+					<span class="badge">+18</span>
+					<h2 data-t="gate_title"></h2>
+					<p data-t="gate_text"></p>
+					<button class="button" id="gate-accept" type="button" data-t="gate_accept"></button>
+					<button class="button secondary" id="gate-exit" type="button" data-t="gate_exit"></button>
+					<p class="fine" data-t="gate_fine"></p>
+				</div>
+
+				<div class="card" id="loading" hidden>
+					<div class="loading-label"><span data-t="loading"></span><span id="percent"></span></div>
+					<div class="bar indeterminate" id="bar"><div class="bar-fill" id="bar-fill"></div></div>
+					<p class="tip" data-t="tip"></p>
+				</div>
+
+				<div id="status-notice" hidden></div>
+			</div>
+
+			<a class="ad" id="ad" hidden target="_blank" rel="noopener sponsored">
+				<img id="ad-image" alt="">
+				<span class="ad-tag" data-t="ad"></span>
+			</a>
+		</div>
+
+		<script src="metrics.js"></script>
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const AGE_KEY = 'overtime_age_ok';
+	const TEXTS = {
+		es: {
+			subtitle: 'Termina el informe. Atiende a la oficina.',
+			gate_title: 'Solo para adultos',
+			gate_text: 'Overtime es un juego para mayores de 18 años con desnudos y sexo explícito entre personajes adultos ficticios.',
+			gate_accept: 'Tengo 18 años o más · Entrar',
+			gate_exit: 'Salir',
+			gate_fine: 'Al entrar confirmas que eres mayor de edad en tu país y que quieres ver este contenido.',
+			loading: 'Cargando la oficina…',
+			tip: 'Lo que lleva puesto Candela decide lo que pasa en su mesa.',
+			ad: 'Publicidad',
+			error: 'No se ha podido cargar el juego.',
+			missing: 'A tu navegador le faltan funciones que el juego necesita:',
+		},
+		en: {
+			subtitle: 'Finish the report. Service the office.',
+			gate_title: 'Adults only',
+			gate_text: 'Overtime is a game for players 18 and over, with nudity and explicit sex between fictional adult characters.',
+			gate_accept: "I'm 18 or older · Enter",
+			gate_exit: 'Leave',
+			gate_fine: 'By entering you confirm you are of legal age in your country and want to see this content.',
+			loading: 'Loading the office…',
+			tip: 'What Candela is wearing decides what happens at her desk.',
+			ad: 'Ad',
+			error: "The game couldn't be loaded.",
+			missing: 'Your browser is missing features the game needs:',
+		},
+	};
+
+	const metrics = window.overtimeMetrics;
+	const storage = {
+		get(key) {
+			try { return localStorage.getItem(key); } catch { return null; }
+		},
+		set(key, value) {
+			try { localStorage.setItem(key, value); } catch { /* modo privado: se volverá a preguntar */ }
+		},
+	};
+
+	// Idioma: el que eligió en el juego (L10n lo guarda aquí) o el del navegador.
+	const saved = storage.get('overtime_lang');
+	const lang = saved === 'es' || saved === 'en' ? saved : ((navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en');
+	const t = TEXTS[lang];
+	document.documentElement.lang = lang;
+	for (const el of document.querySelectorAll('[data-t]')) el.textContent = t[el.dataset.t];
+
+	const $ = (id) => document.getElementById(id);
+	const statusOverlay = $('status');
+	const accepted = storage.get(AGE_KEY) === '1';
+
+	if (metrics) {
+		metrics.init('{}');
+		metrics.view(JSON.stringify({ lang, age_gate: accepted ? 'skipped' : 'shown' }));
+	}
+
+	function showNotice(text) {
+		const notice = $('status-notice');
+		notice.textContent = '';
+		for (const line of text.split('\n')) {
+			notice.append(document.createTextNode(line), document.createElement('br'));
+		}
+		notice.hidden = false;
+		$('loading').hidden = true;
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		showNotice(`${t.error}\n${err instanceof Error ? err.message : String(err || '')}`);
+	}
+
+	// --- Patrocinador (data/ads.json, el mismo que usa el juego) -------------------------
+
+	function resolve(value) {
+		if (value && typeof value === 'object' && !Array.isArray(value)) {
+			const keys = Object.keys(value);
+			if (keys.length && keys.every((k) => k === 'es' || k === 'en')) return resolve(value[lang] ?? value.es);
+			return Object.fromEntries(keys.map((k) => [k, resolve(value[k])]));
+		}
+		return value;
+	}
+
+	function showAd() {
+		fetch('loader/ads.json').then((r) => r.json()).then((raw) => {
+			const ads = resolve(raw);
+			const variants = Object.keys(ads.banners || {});
+			const variant = ads.variant || variants[Math.floor(Math.random() * variants.length)];
+			const banner = ((ads.banners || {})[variant] || {}).menu;
+			if (!ads.url || !banner) return;
+			const link = $('ad');
+			const defaults = { ...(ads.tracking || {}), utm_content: 'banner-loader' };
+			link.href = metrics ? metrics.outboundUrl(ads.url, JSON.stringify(defaults)) : ads.url;
+			link.dataset.offer = 'banner-loader';
+			link.dataset.trackOut = ads.destination || 'amateur';
+			link.dataset.variant = variant;
+			$('ad-image').src = banner.replace('res://assets/ads/', 'ads/');
+			$('ad-image').alt = ads.sponsor || '';
+			link.hidden = false;
+			if (metrics) metrics.send('event', JSON.stringify({ offer_slug: 'ad_impression', placement: 'loader', variant, lang }));
+		}).catch(() => { /* sin anuncio no pasa nada */ });
+	}
+
+	// Un solo listener para todo lo medible (data-offer; data-track-out = click de salida con su destino).
+	document.addEventListener('click', (event) => {
+		const el = event.target.closest && event.target.closest('[data-offer]');
+		if (!el || !metrics) return;
+		const meta = JSON.stringify({ lang, ...(el.dataset.variant ? { action: 'ad', variant: el.dataset.variant } : {}) });
+		if (el.dataset.trackOut) metrics.outbound(el.dataset.trackOut, el.dataset.offer, meta);
+		else metrics.click(el.dataset.offer, meta);
+	});
+
+	// --- Carga del motor (plantilla oficial de Godot 4.7, con nuestra UI) ---------------------
+
+	function start() {
+		$('gate').hidden = true;
+		$('loading').hidden = false;
+		showAd();
+
+		const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+		if (missing.length !== 0) {
+			if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+				let registration;
+				try {
+					registration = navigator.serviceWorker.getRegistration();
+				} catch (err) {
+					registration = Promise.reject(new Error('Service worker registration failed.'));
+				}
+				Promise.race([
+					registration.then((r) => (r != null ? Promise.reject(new Error('Service worker already exists.')) : r))
+						.then(() => engine.installServiceWorker()),
+					new Promise((resolve) => setTimeout(resolve, 2000)),
+				]).then(() => window.location.reload()).catch((err) => console.error('Error while registering service worker:', err));
+			} else {
+				showNotice(`${t.missing}\n${missing.join('\n')}`);
+			}
+			return;
+		}
+
+		engine.startGame({
+			onProgress(current, total) {
+				const bar = $('bar');
+				if (current > 0 && total > 0) {
+					const pct = Math.min(100, Math.round((current / total) * 100));
+					bar.classList.remove('indeterminate');
+					$('bar-fill').style.width = `${pct}%`;
+					$('percent').textContent = `${pct} %`;
+				} else {
+					bar.classList.add('indeterminate');
+					$('percent').textContent = '';
+				}
+			},
+		}).then(() => {
+			statusOverlay.classList.add('leaving');
+			setTimeout(() => statusOverlay.remove(), 400);
+		}, displayFailureNotice);
+	}
+
+	$('gate-accept').dataset.offer = 'age-accept';
+	$('gate-exit').dataset.offer = 'age-exit';
+	$('gate-accept').addEventListener('click', () => {
+		storage.set(AGE_KEY, '1');
+		start();
+	});
+	$('gate-exit').addEventListener('click', () => {
+		window.location.href = 'https://www.google.com/';
+	});
+
+	if (accepted) {
+		start();
+	} else {
+		$('gate').hidden = false;
+		$('gate-accept').focus();
+	}
+}());
+		</script>
+	</body>
+</html>

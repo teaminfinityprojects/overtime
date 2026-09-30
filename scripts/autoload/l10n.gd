@@ -49,6 +49,9 @@ func _apply(value: String) -> void:
 	else:
 		TranslationServer.remove_translation(_english)
 	TranslationServer.set_locale(lang)
+	# La pantalla de carga (web/shell.html) lo lee de aquí para salir en el mismo idioma la próxima vez.
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("try { localStorage.setItem('overtime_lang', '%s') } catch (e) {}" % lang, true)
 
 
 ## Traducción desde código estático (funciones static no tienen tr()).
